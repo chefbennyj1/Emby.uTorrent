@@ -36,11 +36,6 @@ namespace uTorrent
                 {
                     Name = "TorrentPluginConfigurationPageJS",
                     EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginConfigurationPage.js",
-                },
-                new PluginPageInfo
-                {
-                    Name = "Chart.bundle.js",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.Chart.bundle.js"
                 }
             };
         }
