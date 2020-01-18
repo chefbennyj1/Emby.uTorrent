@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net;
-using System.Text;
-using MediaBrowser.Model.Serialization;
 using uTorrent.Helpers;
 
 namespace uTorrent.Api
 {
     public class TorrentParser
     {
-        
         public static List<Torrent> ParseTorrentListInfo(List<object[]> obj, string SortBy = null)
         {
             var config = Plugin.Instance.Configuration;
@@ -34,7 +29,8 @@ namespace uTorrent.Api
                 Uploaded = t[6].ToString(),
                 Ratio = t[7].ToString(),
                 UploadSpeed = t[8].ToString(),
-                DownloadSpeed = FileSizeConversions.SizeSuffix(Convert.ToInt64(t[9])),
+                DownloadSpeedFriendly = FileSizeConversions.SizeSuffix(Convert.ToInt64(t[9])),
+                DownloadSpeed = t[9].ToString(),
                 Eta = t[10].ToString() == "0"
                     ? "Complete"
                     : (Convert.ToInt32(t[10].ToString()) / 60).ToString() + " minute(s)",
@@ -73,7 +69,7 @@ namespace uTorrent.Api
                 }
            
             } catch { }
-            return string.Empty;
+            return DateTime.Now.ToString("U");
         }
     }
     

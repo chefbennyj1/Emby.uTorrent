@@ -37,6 +37,8 @@ namespace uTorrent.Api
 
         public string DownloadSpeed { get; set; }
 
+        public string DownloadSpeedFriendly { get; set; }
+
         public string Eta { get; set; }
 
         public string Label { get; set; }

@@ -1,23 +1,39 @@
 ﻿
 <div data-role="page" style="align-items: center; margin: auto; padding: 3em; top:4em" class="type-interior pluginConfigurationPage TorrentPluginConfigurationPage" data-require="emby-button,emby-input,emby-select" data-controller="__plugin/TorrentPluginConfigurationPageJS">
     <div class="content-primary">
-        <div style="margin-top: 2em; margin-bottom:2em">
-            <div class="detailSectionHeader">
-                <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">uTorrent credentials</h2>
-                <button is="emby-button" id="openTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">link</i></button>
+        <div style="display:flex">
+            <div style="margin-top: 2em;margin-bottom: 2em;flex-grow:1;padding-right: 3em;">
+                <div class="detailSectionHeader">
+                    <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">uTorrent credentials</h2>
+                    <button is="emby-button" id="openTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">link</i></button>
+                </div>
+                <div class="detailSectionHeader">
+                    <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
+                    <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
+                </div>
+                <div class="paperList">
+                    <label class="listItemCheckboxContainer emby-checkbox-label">
+                        <input name="enableRealTimeMonitoring" type="checkbox" is="emby-checkbox" id="enableRealTimeMonitoring" class="emby-checkbox" data-embycheckbox="true">
+                        <span class="checkboxLabel">Enable Realtime monitoring</span>
+                        <span class="emby-checkbox-focushelper"></span>
+                        <span class="checkboxOutline">
+                            <i class="md-icon checkboxIcon checkboxIcon-checked"></i>
+                            <i class="md-icon checkboxIcon checkboxIcon-unchecked"></i>
+                        </span>
+                    </label>
+                    <p>Turning off realtime monitoring will take three seconds to shut down.</p>
+                </div>
             </div>
-            <div class="detailSectionHeader">
-                <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
-                <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
+            <div id="downloadSpeedChartContainer" style="position:relative;width: 75%; padding-right:2em">
+                <canvas id="downloadSpeedChart"></canvas>
             </div>
         </div>
-
         <br />
-        
+
         <div style="display: flex">
             <h1 id="torrentListHeader">Active Torrents</h1>
-           
         </div>
+
         <div class="scrollY" style="max-height: 30em">
 
             <table class="tblTorrentResults table detailTable" style="width: 100%;">
@@ -39,13 +55,6 @@
 
                 <tbody class="torrentResultBody"></tbody>
             </table>
-        </div>
-
-        <div style="margin-top: 1em; margin-bottom:2em">
-            <button id="getListByDateAdded" is="emby-button" class="emby-button raised">List By Date Added</button>
-            <button id="getListByName" is="emby-button" class="emby-button raised">List By Name</button>
-            <button id="getListByFileSize" is="emby-button" class="emby-button raised">List By File Size</button>
-            <button id="getDownloading" is="emby-button" class="emby-button raised">Currently Downloading</button>
         </div>
 
     </div>

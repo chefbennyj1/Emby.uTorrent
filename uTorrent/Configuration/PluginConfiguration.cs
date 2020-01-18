@@ -9,5 +9,6 @@ namespace uTorrent.Configuration
         public string userName { get; set; }
         public string password { get; set; }
         public string FinishedDownloadsLocation { get; set; }
+        public bool EnableRealtimeMonitoring { get; set; }
     }
 }

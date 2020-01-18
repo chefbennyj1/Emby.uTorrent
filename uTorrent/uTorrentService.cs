@@ -153,10 +153,23 @@ namespace uTorrent
             public string TorrentFiles { get; set; }
         }
 
-        [Route("/GetTotalDriveSpace", "GET", Summary = "Torrent List End Point")]
-        public class GetTotalDriveSpace : IReturn<string>
+        [Route("/GetDownloadRate", "GET", Summary = "")]
+        public class DownloadRate : IReturn<string>
         {
+
+            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Token { get; set; }
+            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string IpAddress { get; set; }
+            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Port { get; set; }
+            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string UserName { get; set; }
+            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Password { get; set; }
+            
             public string size { get; set; }
+            public string sizeSuffix { get; set; }
         }
       
         private static  IJsonSerializer JsonSerializer { get; set; }
@@ -359,6 +372,42 @@ namespace uTorrent
                 }
             }
             
+        }
+
+        public string Get(DownloadRate request)
+        {
+            var torrents = new List<Torrent>();
+            const string endpoint = "/gui/?list=1&token=";
+            var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+            var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+            httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
+
+            using (var response = (HttpWebResponse) httpWebRequest.GetResponse())
+            {
+                if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
+
+                using (var receiveStream = response.GetResponseStream())
+                {
+                    if (receiveStream == null) return string.Empty;
+                    using (var sr = new StreamReader(receiveStream,
+                        Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
+                    {
+                        var data = sr.ReadToEnd();
+
+                        var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
+                        torrents = TorrentParser.ParseTorrentListInfo(results.torrents);
+
+                    }
+                }
+
+                var total = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
+                return JsonSerializer.SerializeToString(new DownloadRate()
+                {
+                    size = total[0],
+                    sizeSuffix = total[1]
+                });
+
+            }
         }
 
         // ReSharper disable  UnusedAutoPropertyAccessor.Local
