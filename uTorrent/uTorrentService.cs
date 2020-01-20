@@ -11,6 +11,7 @@ using uTorrent.Helpers;
 
 namespace uTorrent
 {
+    
     public class UTorrentService : IService
     {
         [Route("/StopTorrent", "GET", Summary = "Start Torrent End Point")]
@@ -173,7 +174,8 @@ namespace uTorrent
         }
       
         private static  IJsonSerializer JsonSerializer { get; set; }
-
+        private string cacheId { get; set; } = null;
+        private List<Torrent> torrents = new List<Torrent>();
         public UTorrentService(IJsonSerializer json)
         {
             JsonSerializer = json;
@@ -183,9 +185,13 @@ namespace uTorrent
 
         public string Get(GetFiles request)
         {
-            var torrents = new List<Torrent>();
-            const string endpoint = "/gui/?list=1&token=";
-            var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+            
+            const string gui = "/gui/?";
+            const string list = "&list=1";
+            const string token = "token=";
+            const string cache = "&cid=";
+            var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{list}";
+            url += cacheId == null ? string.Empty : $"{cache}{cacheId}";
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
 
@@ -201,7 +207,29 @@ namespace uTorrent
                         var data = sr.ReadToEnd();
 
                         var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-                        torrents = TorrentParser.ParseTorrentListInfo(results.torrents, request.SortBy);
+
+                        var torrentList = torrents.Count <= 0 ? results.torrents : results.torrentp;
+                        cacheId = results.torrentc;
+
+                        var torrentListChanges = TorrentParser.ParseTorrentListInfo(torrentList, request.SortBy);
+                        if (torrents.Count <= 0)
+                        {
+                            torrents = torrentListChanges;
+                        }
+                        else
+                        {
+                            foreach (var item in torrents)
+                            {
+                                foreach (var i in torrentListChanges)
+                                {
+                                    if (i.Hash == item.Hash)
+                                    {
+                                        torrents.Remove(item);
+                                        torrents.Add(i);
+                                    }
+                                }
+                            }
+                        }
 
                     }
                 }
