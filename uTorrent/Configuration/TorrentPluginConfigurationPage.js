@@ -368,7 +368,7 @@
                                         view.querySelector('#torrentListHeader').innerHTML =
                                             "Torrents By Date Added: " + totalSize.size;
                                         if (realTimeMonitor === true) {
-                                            setTimeout(updateTorrentData(chartData, chartLabels, c, view), 5000);
+                                            setTimeout(updateTorrentData(chartData, chartLabels, c, view), 2000);
                                         }
                                     });
                                 });
@@ -383,7 +383,7 @@
                     var chartData = c.data.datasets[0].data;
                     var chartLabels = c.data.labels;
                     updateTorrentData(chartData, chartLabels, c, view);
-
+                    loading.hide();
                 });
         }
 
@@ -393,6 +393,7 @@
                     enableRealTimeMonitoring(view);
                     view.querySelector('#enableRealTimeMonitoring').checked = config.EnableRealtimeMonitoring;
                     realTimeMonitor = config.EnableRealtimeMonitoring;
+                    return;
                 } else {
                     getTorrents(config, "DateAdded").then((torrents) => {
                         view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(torrents);
@@ -401,6 +402,8 @@
                     calculateTotalTorrentDriveSpace(config).then(totalSize => {
                         view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + totalSize.size;
                     });
+                    loading.hide();
+                    return;
                 }
             }
             loading.hide();
@@ -499,8 +502,7 @@
 
         return function (view) {
             view.addEventListener('viewshow',
-                () => {
-
+                () => { 
 
                     loading.show();
 
