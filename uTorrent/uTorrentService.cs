@@ -176,6 +176,7 @@ namespace uTorrent
         private static  IJsonSerializer JsonSerializer { get; set; }
         private string cacheId { get; set; } = null;
         private List<Torrent> torrents = new List<Torrent>();
+
         public UTorrentService(IJsonSerializer json)
         {
             JsonSerializer = json;
@@ -190,6 +191,7 @@ namespace uTorrent
             const string list = "&list=1";
             const string token = "token=";
             const string cache = "&cid=";
+
             var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{list}";
             url += cacheId == null ? string.Empty : $"{cache}{cacheId}";
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
@@ -207,29 +209,20 @@ namespace uTorrent
                         var data = sr.ReadToEnd();
 
                         var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-
-                        var torrentList = torrents.Count <= 0 ? results.torrents : results.torrentp;
+                        
                         cacheId = results.torrentc;
 
-                        var torrentListChanges = TorrentParser.ParseTorrentListInfo(torrentList, request.SortBy);
-                        if (torrents.Count <= 0)
-                        {
-                            torrents = torrentListChanges;
+                        //torrents count 0 means first request
+                        //torrentsp are only items returned that have changed since the last request of data using the cacheId from the prior request
+                        var torrentListChanges = TorrentParser.ParseTorrentListInfo(torrents.Count <= 0 ? results.torrents : results.torrentp, request.SortBy);
+
+                        if (torrents.Count <= 0) {
+                            torrents = torrentListChanges; //First update request would hold all the torrents, add them all to the master list.
+                            return JsonSerializer.SerializeToString(torrents); //Just return the list now.
                         }
-                        else
-                        {
-                            foreach (var item in torrents)
-                            {
-                                foreach (var i in torrentListChanges)
-                                {
-                                    if (i.Hash == item.Hash)
-                                    {
-                                        torrents.Remove(item);
-                                        torrents.Add(i);
-                                    }
-                                }
-                            }
-                        }
+
+                        torrents = torrents.Where(t1 => torrentListChanges.Any(t2 => t1.Hash != t2.Hash)).ToList(); //Should remove any torrent data that has changed from the master list by comparing torrent Hash's
+                        torrents.AddRange(torrentListChanges); //Add the new data to the mast list
 
                     }
                 }
@@ -404,16 +397,21 @@ namespace uTorrent
 
         public string Get(DownloadRate request)
         {
-            var torrents = new List<Torrent>();
-            const string endpoint = "/gui/?list=1&token=";
-            var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+            const string gui = "/gui/?";
+            const string list = "&list=1";
+            const string token = "token=";
+            const string cache = "&cid=";
+
+            var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{list}";
+            url += cacheId == null ? string.Empty : $"{cache}{cacheId}";
+
             var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
             httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
 
             using (var response = (HttpWebResponse) httpWebRequest.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
-
+                List<Torrent> torrentList;
                 using (var receiveStream = response.GetResponseStream())
                 {
                     if (receiveStream == null) return string.Empty;
@@ -423,12 +421,16 @@ namespace uTorrent
                         var data = sr.ReadToEnd();
 
                         var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-                        torrents = TorrentParser.ParseTorrentListInfo(results.torrents);
+
+                        //torrents count 0 means first request
+                        //torrentsp are only items returned that have changed since the last request of data using the cacheId from the prior request
+                        torrentList = TorrentParser.ParseTorrentListInfo(torrents.Count <= 0 ? results.torrents : results.torrentp); 
+                        cacheId = results.torrentc;
 
                     }
                 }
 
-                var total = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
+                var total = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
                 return JsonSerializer.SerializeToString(new DownloadRate()
                 {
                     size = total[0],

@@ -347,10 +347,9 @@
         }
 
         
-        function updateChart(chartData, chartLabels, c, view) {
+        function updateTorrentData(chartData, chartLabels, c, view) {
             ApiClient.getPluginConfiguration(pluginId).then(
-                (config) => {
-
+                (config) => { 
                     getDownloadRate(config).then(
                         (result) => {
                             if (chartData.length > 5) {
@@ -369,7 +368,7 @@
                                         view.querySelector('#torrentListHeader').innerHTML =
                                             "Torrents By Date Added: " + totalSize.size;
                                         if (realTimeMonitor === true) {
-                                            setTimeout(updateChart(chartData, chartLabels, c, view), 5000);
+                                            setTimeout(updateTorrentData(chartData, chartLabels, c, view), 5000);
                                         }
                                     });
                                 });
@@ -383,7 +382,7 @@
                     var c = drawDownloadChart(view, chart);
                     var chartData = c.data.datasets[0].data;
                     var chartLabels = c.data.labels;
-                    updateChart(chartData, chartLabels, c, view);
+                    updateTorrentData(chartData, chartLabels, c, view);
 
                 });
         }
