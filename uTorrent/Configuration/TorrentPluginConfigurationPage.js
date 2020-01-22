@@ -2,30 +2,11 @@
     function (loading, dialogHelper) {
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
-
-        var torrentMonitor;  //Interval Timer to update torrent data for real time monitoring every 5 seconds
+        
         var realTimeMonitor; //Interval Timer to update download speed chart data for real time monitoring every 1.5 seconds
 
 
-        function calculateTotalTorrentDriveSpace(config) {
-            return new Promise((resolve, reject) => {
-                getToken(config).then(token => {
-                    ApiClient.getJSON(ApiClient.getUrl("GetTotalDriveSpaceUsed?Token=" +
-                        token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password))).then((result) => {
-                            resolve(result);
-                        });
-                });
-            });
-        }
-
+        
         function openAddTorrentDialog() {
             loading.show();
 
@@ -232,10 +213,10 @@
             });
         }
 
-        function getTorrents(config, sortBy) {
+        function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
                 getToken(config).then(token => {
-                    ApiClient.getJSON(ApiClient.getUrl("GetFiles?Token=" +
+                    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
                         encodeURIComponent(token) +
                         "&IpAddress=" +
                         config.ipAddress +
@@ -270,26 +251,7 @@
                 });
             });
         }
-
-        function getTorrentBroadbandRate(config) {
-            return new Promise((resolve, reject) => {
-                getToken(config).then((token) => {
-                    ApiClient.getJSON(ApiClient.getUrl("GetDownloadRate?Token=" +
-                        encodeURIComponent(token) +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password))).then((result) => {
-                            resolve(result);
-                        });
-                });
-            });
-        }
-
+        
         function remoteControlTorrent(remoteCommand, id, config) {
             return new Promise((resolve, reject) => {
                 getToken(config).then((token) => {
@@ -340,24 +302,25 @@
                 dlg.querySelector('#pass').value = config.password;
                 dlg.querySelector('#ip').value = config.ipAddress;
                 dlg.querySelector('#port').value = config.port;
-                dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation;
-
+                dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation; 
             }
 
         }
-
-        
+           
         function updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view) {
             ApiClient.getPluginConfiguration(pluginId).then(
                 (config) => { 
-                    getTorrentBroadbandRate(config).then(
+
+                    getUTorrentData(config, "DateAdded").then(
                         (result) => {
+                            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(result.torrents);
+
                             if (downloadChartData.length > 5) {
                                 downloadChartData.splice(0, 1);
                                 uploadChartData.splice(0, 1);
                                 c.data.labels.splice(0, 1);
                             }
-                            
+
                             c.data.datasets[0].data.push(parseInt(result.sizeDownload, 10));
                             c.data.datasets[1].data.push(parseInt(result.sizeUpload, 10));
 
@@ -366,19 +329,14 @@
                             c.data.datasets[0].label = "Download Speed (" + result.sizeSuffixDownload + ")";
                             c.data.datasets[1].label = "Upload Speed (" + result.sizeSuffixUpload + ")";
                             c.update();
-
-                            getTorrents(config, "DateAdded").then(
-                                (torrents) => {
-                                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(torrents);
-                                    calculateTotalTorrentDriveSpace(config).then((totalSize) => {
-                                        view.querySelector('#torrentListHeader').innerHTML =
-                                            "Torrents By Date Added: " + totalSize.size;
-                                        if (realTimeMonitor === true) {
-                                            setTimeout(updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view), 2000);
-                                        }
-                                    });
-                                });
+                             
+                            view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
+                            if (realTimeMonitor === true) {
+                                setTimeout(updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view), 2000);
+                            }
+                            
                         });
+                       
                 });
         }
 
@@ -400,17 +358,14 @@
                     enableRealTimeMonitoring(view);
                     view.querySelector('#enableRealTimeMonitoring').checked = config.EnableRealtimeMonitoring;
                     realTimeMonitor = config.EnableRealtimeMonitoring;
-                    return;
-                } else {
-                    getTorrents(config, "DateAdded").then((torrents) => {
-                        view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(torrents);
-
-                    });
-                    calculateTotalTorrentDriveSpace(config).then(totalSize => {
-                        view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + totalSize.size;
-                    });
                     loading.hide();
                     return;
+                } else {
+                    getUTorrentData(config, "DateAdded").then((results) => {
+                        view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+                        view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
+                        loading.hide();
+                    });
                 }
             }
             loading.hide();
@@ -523,7 +478,6 @@
                     view.querySelector('#openTorrentDialog').addEventListener('click',
                         () => {
                             loading.show();
-                            clearInterval(torrentMonitor);
                             openSettingsDialog(view);
                             loading.hide();
                         });

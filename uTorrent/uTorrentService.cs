@@ -86,24 +86,9 @@ namespace uTorrent
             [ApiMember(Name = "Url", Description = "Url", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Url { get; set; }
         }
-
-        [Route("/GetDownloads", "GET", Summary = "Downloading Torrent List End Point")]
-        public class GetDownloads : IReturn<string>
-        {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string IpAddress { get; set; }
-            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Port { get; set; }
-            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string UserName { get; set; }
-            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Password { get; set; }
-        }
-
-        [Route("/GetFiles", "GET", Summary = "Torrent List End Point")]
-        public class GetFiles : IReturn<string>
+        
+        [Route("/GetTorrentData", "GET", Summary = "Torrent List End Point")]
+        public class TorrentData : IReturn<string>
         {
             [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Token { get; set; }
@@ -119,7 +104,13 @@ namespace uTorrent
             public string SortBy { get; set; }
 
 
-            public string TorrentFiles { get; set; }
+            public List<Torrent> torrents { get; set; }
+            public string sizeDownload { get; set; }
+            public string sizeSuffixDownload { get; set; }
+            public string sizeUpload { get; set; }
+            public string sizeSuffixUpload { get; set; }
+            public string sizeTotalDriveSpace { get; set; }
+            public string sizeTotalDriveSpaceBytes { get; set; }
         }
 
         [Route("/GetToken", "GET", Summary = "Torrent Token End Point")]
@@ -136,45 +127,6 @@ namespace uTorrent
 
             public string token { get; set; }
         }
-
-        [Route("/GetTotalDriveSpaceUsed", "GET", Summary = "Torrent List End Point")]
-        public class GetTotalDriveSpaceUsed : IReturn<string>
-        {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string IpAddress { get; set; }
-            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Port { get; set; }
-            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string UserName { get; set; }
-            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Password { get; set; }
-
-            public string TorrentFiles { get; set; }
-        }
-
-        [Route("/GetDownloadRate", "GET", Summary = "")]
-        public class DownloadRate : IReturn<string>
-        {
-
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string IpAddress { get; set; }
-            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Port { get; set; }
-            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string UserName { get; set; }
-            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Password { get; set; }
-            
-            public string sizeDownload { get; set; }
-            public string sizeSuffixDownload { get; set; }
-            public string sizeUpload { get; set; }
-            public string sizeSuffixUpload { get; set; }
-        }
-      
 
         private static IJsonSerializer JsonSerializer  { get; set; }
         private string CacheId                         { get; set; }
@@ -195,7 +147,7 @@ namespace uTorrent
 
         // ReSharper disable MethodNameNotMeaningful
 
-        public string Get(GetFiles request)
+        public string Get(TorrentData request)
         {
             var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{list}";
 
@@ -230,17 +182,32 @@ namespace uTorrent
                         if (torrents.Count <= 0)
                         {
                             torrents = torrentListChanges; //First update request would hold all the torrents, add them all to the master list.
-                            return JsonSerializer.SerializeToString(torrents); //Just return the list now.
+                        }
+                        else
+                        {
+                            //Should remove any torrent data that has changed from the master list by comparing torrent Hash's
+                            torrents = torrents.Where(t1 => torrentListChanges.Any(t2 => t1.Hash != t2.Hash)).ToList();
+                            torrents.AddRange(torrentListChanges); //Add the new data to the master list
                         }
 
-                        //Should remove any torrent data that has changed from the master list by comparing torrent Hash's
-                        torrents = torrents.Where(t1 => torrentListChanges.Any(t2 => t1.Hash != t2.Hash)).ToList(); 
-                        torrents.AddRange(torrentListChanges); //Add the new data to the master list
+                        var totalDownloadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
+                        var totalUploadRate   = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
 
+                        return JsonSerializer.SerializeToString(new TorrentData()
+                        {
+                            torrents                 = torrents,
+                            sizeDownload             = totalDownloadRate[0],
+                            sizeSuffixDownload       = totalDownloadRate[1],
+                            sizeUpload               = totalUploadRate[0],
+                            sizeSuffixUpload         = totalUploadRate[1],
+                            sizeTotalDriveSpace      = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt64(t.TotalBytes))),
+                            sizeTotalDriveSpaceBytes = torrents.Sum(t => Convert.ToInt64(t.TotalBytes)).ToString()
+
+                        });
                     }
                 }
             }
-            return JsonSerializer.SerializeToString(torrents);
+            
         }
 
         public string Get(GetToken request)
@@ -268,35 +235,6 @@ namespace uTorrent
                     }
                 }
             }
-        }
-
-        public string Get(GetDownloads request)
-        {
-            var torrents = new List<Torrent>();
-            const string endpoint = "/gui/?list=1&token=";
-            var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
-
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-            httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
-           
-            using (var response = (HttpWebResponse)httpWebRequest.GetResponse())
-            {
-                if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
-
-                using (var receiveStream = response.GetResponseStream())
-                {
-                    if (receiveStream == null) return string.Empty;
-                    using (var sr = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
-                    {
-                        var data = sr.ReadToEnd();
-
-                        var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-                        torrents = TorrentParser.ParseTorrentListInfo(results.torrents).Where(t => Convert.ToInt32(t.Progress) < 1000).ToList();
-                    }
-                }
-            }
-
-            return JsonSerializer.SerializeToString(torrents);
         }
 
         public string Get(AddTorrentUrl request)
@@ -370,89 +308,6 @@ namespace uTorrent
             }
         }
         
-        public string Get(GetTotalDriveSpaceUsed request)
-        {
-            var totalBytes = 0L;
-
-            const string endpoint = "/gui/?list=1&token=";
-            var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
-
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-            httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
-
-            using (var response = (HttpWebResponse)httpWebRequest.GetResponse())
-            {
-                if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
-
-                using (var receiveStream = response.GetResponseStream())
-                {
-                    if (receiveStream == null) return string.Empty;
-                    using (var sr = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
-                    {
-                        var data = sr.ReadToEnd();
-
-                        var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-                        var torrents = TorrentParser.ParseTorrentListInfo(results.torrents);
-                        foreach (var torrent in torrents)
-                        {
-                            totalBytes += Convert.ToInt64(torrent.TotalBytes);
-                        }
-                        return JsonSerializer.SerializeToString(new DriveSizeResponse
-                        {
-                            size = FileSizeConversions.SizeSuffix(totalBytes),
-                            bytes = totalBytes
-                        });
-                    }
-                }
-            }
-            
-        }
-
-        public string Get(DownloadRate request)
-        {
-            var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{list}";
-
-            url += CacheId == null ? string.Empty : $"{cache}{CacheId}";
-
-            var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
-            httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
-
-            using (var response = (HttpWebResponse) httpWebRequest.GetResponse())
-            {
-                if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
-                List<Torrent> torrentList;
-                using (var receiveStream = response.GetResponseStream())
-                {
-                    if (receiveStream == null) return string.Empty;
-                    using (var sr = new StreamReader(receiveStream,
-                        Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
-                    {
-                        var data = sr.ReadToEnd();
-
-                        var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-
-                        //torrents count 0 means first request
-                        //torrentsp are only items returned that have changed since the last request of data using the cacheId from the prior request
-                        torrentList = TorrentParser.ParseTorrentListInfo(torrents.Count <= 0 ? results.torrents : results.torrentp); 
-                        CacheId = results.torrentc;
-
-                    }
-                }
-
-                var totalDownload = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
-                var totalUpload   = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
-
-                return JsonSerializer.SerializeToString(new DownloadRate()
-                {
-                    sizeDownload = totalDownload[0],
-                    sizeSuffixDownload = totalDownload[1],
-                    sizeUpload = totalUpload[0],
-                    sizeSuffixUpload = totalUpload[1]
-                });
-
-            }
-        }
-
         // ReSharper disable  UnusedAutoPropertyAccessor.Local
         private class DriveSizeResponse
         {
