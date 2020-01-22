@@ -271,7 +271,7 @@
             });
         }
 
-        function getDownloadRate(config) {
+        function getTorrentBroadbandRate(config) {
             return new Promise((resolve, reject) => {
                 getToken(config).then((token) => {
                     ApiClient.getJSON(ApiClient.getUrl("GetDownloadRate?Token=" +
@@ -347,18 +347,24 @@
         }
 
         
-        function updateTorrentData(chartData, chartLabels, c, view) {
+        function updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view) {
             ApiClient.getPluginConfiguration(pluginId).then(
                 (config) => { 
-                    getDownloadRate(config).then(
+                    getTorrentBroadbandRate(config).then(
                         (result) => {
-                            if (chartData.length > 5) {
-                                chartData.splice(0, 1);
-                                chartLabels.splice(0, 1);
+                            if (downloadChartData.length > 5) {
+                                downloadChartData.splice(0, 1);
+                                uploadChartData.splice(0, 1);
+                                c.data.labels.splice(0, 1);
                             }
-                            c.data.datasets[0].data.push(parseInt(result.size, 10));
+                            
+                            c.data.datasets[0].data.push(parseInt(result.sizeDownload, 10));
+                            c.data.datasets[1].data.push(parseInt(result.sizeUpload, 10));
+
                             c.data.labels.push(new Date().getSeconds());
-                            c.data.datasets[0].label = "Download Speed (" + result.sizeSuffix + ")";
+
+                            c.data.datasets[0].label = "Download Speed (" + result.sizeSuffixDownload + ")";
+                            c.data.datasets[1].label = "Upload Speed (" + result.sizeSuffixUpload + ")";
                             c.update();
 
                             getTorrents(config, "DateAdded").then(
@@ -368,7 +374,7 @@
                                         view.querySelector('#torrentListHeader').innerHTML =
                                             "Torrents By Date Added: " + totalSize.size;
                                         if (realTimeMonitor === true) {
-                                            setTimeout(updateTorrentData(chartData, chartLabels, c, view), 2000);
+                                            setTimeout(updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view), 2000);
                                         }
                                     });
                                 });
@@ -380,9 +386,10 @@
             require([Dashboard.getConfigurationResourceUrl('Chart.bundle.js')],
                 (chart) => {
                     var c = drawDownloadChart(view, chart);
-                    var chartData = c.data.datasets[0].data;
-                    var chartLabels = c.data.labels;
-                    updateTorrentData(chartData, chartLabels, c, view);
+                    var downloadChartData = c.data.datasets[0].data;
+                    var uploadChartData   = c.data.datasets[1].data;
+                    var chartLabels       = c.data.labels;
+                    updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view);
                     loading.hide();
                 });
         }
@@ -486,7 +493,12 @@
                             borderColor: "#4584b5",
                             fill: false,
                             data: [0]
-                        }]
+                        }, {
+                            label: 'Upload Speed',
+                            borderColor: "#D4AF37",
+                            fill: false,
+                            data: [0]
+                            }]
                     },
                     options: {
                         title: {

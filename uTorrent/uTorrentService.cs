@@ -169,8 +169,10 @@ namespace uTorrent
             [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Password { get; set; }
             
-            public string size { get; set; }
-            public string sizeSuffix { get; set; }
+            public string sizeDownload { get; set; }
+            public string sizeSuffixDownload { get; set; }
+            public string sizeUpload { get; set; }
+            public string sizeSuffixUpload { get; set; }
         }
       
 
@@ -437,11 +439,15 @@ namespace uTorrent
                     }
                 }
 
-                var total = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
+                var totalDownload = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
+                var totalUpload   = FileSizeConversions.SizeSuffix(torrentList.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
+
                 return JsonSerializer.SerializeToString(new DownloadRate()
                 {
-                    size = total[0],
-                    sizeSuffix = total[1]
+                    sizeDownload = totalDownload[0],
+                    sizeSuffixDownload = totalDownload[1],
+                    sizeUpload = totalUpload[0],
+                    sizeSuffixUpload = totalUpload[1]
                 });
 
             }
