@@ -5,7 +5,7 @@
         
         var realTimeMonitor; //Interval Timer to update download speed chart data for real time monitoring every 1.5 seconds
 
-
+        var token = null;
         
         function openAddTorrentDialog() {
             loading.show();
@@ -215,43 +215,65 @@
 
         function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
-                getToken(config).then(token => {
-                    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                        encodeURIComponent(token) +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
-                        "&SortBy=" + sortBy)).then((torrents) => {
-                            resolve(torrents);
+                if (token == null ) {
+                    getToken(config).then(t => {
+                        token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                            encodeURIComponent(token) +
+                            "&IpAddress=" +
+                            config.ipAddress +
+                            "&Port=" +
+                            config.port +
+                            "&UserName=" +
+                            encodeURIComponent(config.userName) +
+                            "&Password=" +
+                            encodeURIComponent(config.password) +
+                            "&SortBy=" +
+                            sortBy)).then((torrentData) => {
+                            resolve(torrentData);
                         });
-                });
-            });
-        }
+                    });
+                }
+              
+                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                    encodeURIComponent(token) +
+                    "&IpAddress=" +
+                    config.ipAddress +
+                    "&Port=" +
+                    config.port +
+                    "&UserName=" +
+                    encodeURIComponent(config.userName) +
+                    "&Password=" +
+                    encodeURIComponent(config.password) +
+                    "&SortBy=" +
+                    sortBy)).then((torrentData) => {
 
-        function getDownloadingTorrents(config) {
-            return new Promise((resolve, reject) => {
-                getToken(config).then((token) => {
-                    ApiClient.getJSON(ApiClient.getUrl("GetDownloads?Token=" +
-                        encodeURIComponent(token) +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password))).then((torrents) => {
-                            resolve(torrents);
+                    resolve(torrentData);
+                        
+                    },
+                    () => {
+                    getToken(config).then(t => {
+                        token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                            encodeURIComponent(token) +
+                            "&IpAddress=" +
+                            config.ipAddress +
+                            "&Port=" +
+                            config.port +
+                            "&UserName=" +
+                            encodeURIComponent(config.userName) +
+                            "&Password=" +
+                            encodeURIComponent(config.password) +
+                            "&SortBy=" +
+                            sortBy)).then((torrentData) => {
+                            resolve(torrentData);
                         });
+                    });
                 });
+               
             });
         }
-        
+           
         function remoteControlTorrent(remoteCommand, id, config) {
             return new Promise((resolve, reject) => {
                 getToken(config).then((token) => {
@@ -434,10 +456,8 @@
             });
         }
 
-        function drawDownloadChart(view, Chart) {
-
+        function drawDownloadChart(view, Chart) { 
             var ctx = view.querySelector('#downloadSpeedChart').getContext("2d");
-
             return new Chart(ctx,
                 {
                     type: 'line',
@@ -488,8 +508,7 @@
                         });
 
                     view.querySelector('#enableRealTimeMonitoring').addEventListener('change',
-                        () => {
-
+                        () => { 
                             realTimeMonitor = view.querySelector('#enableRealTimeMonitoring').checked;
                             ApiClient.getPluginConfiguration(pluginId).then(
                                 (config) => {
