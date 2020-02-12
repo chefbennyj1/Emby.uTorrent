@@ -130,8 +130,6 @@ namespace uTorrent
 
         private static IJsonSerializer JsonSerializer  { get; set; }
         private string CacheId                         { get; set; }
-
-
         private List<Torrent> torrents = new List<Torrent>();
         
         private string gui   => "/gui/?";

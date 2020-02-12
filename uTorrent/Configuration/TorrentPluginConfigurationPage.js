@@ -219,7 +219,7 @@
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                            encodeURIComponent(token) +
+                            token +
                             "&IpAddress=" +
                             config.ipAddress +
                             "&Port=" +
@@ -236,7 +236,7 @@
                 }
               
                 ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                    encodeURIComponent(token) +
+                    token +
                     "&IpAddress=" +
                     config.ipAddress +
                     "&Port=" +
@@ -492,6 +492,8 @@
                 () => { 
 
                     loading.show();
+
+                    token = null; //rest the token
 
                     loadConfig(view);
 
