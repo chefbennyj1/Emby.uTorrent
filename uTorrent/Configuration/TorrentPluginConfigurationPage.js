@@ -350,7 +350,7 @@
 
                             c.data.datasets[0].label = "Download Speed (" + result.sizeSuffixDownload + ")";
                             c.data.datasets[1].label = "Upload Speed (" + result.sizeSuffixUpload + ")";
-                            c.update();
+                            c.update(0);
                              
                             view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
                             if (realTimeMonitor === true) {

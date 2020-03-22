@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
+using MediaBrowser.Common.Net;
 using uTorrent.Api;
 using uTorrent.Helpers;
 
@@ -136,11 +138,13 @@ namespace uTorrent
         private string list  => "&list=1";
         private string token => "token=";
         private string cache => "&cid=";
-        
 
-        public UTorrentService(IJsonSerializer json)
+
+        
+        public UTorrentService(IJsonSerializer json, IHttpClient client)
         {
             JsonSerializer = json;
+            
         }
 
         // ReSharper disable MethodNameNotMeaningful
@@ -191,7 +195,7 @@ namespace uTorrent
                         var totalDownloadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
                         var totalUploadRate   = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
 
-                        return JsonSerializer.SerializeToString(new TorrentData()
+                        return JsonSerializer.SerializeToString(new UTorrentService.TorrentData()
                         {
                             torrents                 = torrents,
                             sizeDownload             = totalDownloadRate[0],
@@ -226,7 +230,7 @@ namespace uTorrent
                     {
                         var data = sr.ReadToEnd();
 
-                        return JsonSerializer.SerializeToString(new GetToken()
+                        return JsonSerializer.SerializeToString(new UTorrentService.GetToken()
                         {
                             token = (data.Split('>')[2]).Split('<')[0]
                         });

@@ -1,8 +1,8 @@
 ﻿
 <div data-role="page" style="align-items: center; margin: auto; padding: 3em; top:4em" class="type-interior pluginConfigurationPage TorrentPluginConfigurationPage" data-require="emby-button,emby-input,emby-select" data-controller="__plugin/TorrentPluginConfigurationPageJS">
     <div class="content-primary">
-        <div style="display:flex">
-            <div style="margin-top: 2em;margin-bottom: 2em;flex-grow:1;padding-right: 3em;">
+        <div style="display:block">
+            <form style="margin-top: 2em;margin-bottom: 2em;flex-grow:1;padding-right: 3em;">
                 <div class="detailSectionHeader">
                     <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">uTorrent credentials</h2>
                     <button is="emby-button" id="openTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">link</i></button>
@@ -16,15 +16,12 @@
                         <input name="enableRealTimeMonitoring" type="checkbox" is="emby-checkbox" id="enableRealTimeMonitoring" class="emby-checkbox" data-embycheckbox="true">
                         <span class="checkboxLabel">Enable Realtime monitoring</span>
                         <span class="emby-checkbox-focushelper"></span>
-                        <span class="checkboxOutline">
-                            <i class="md-icon checkboxIcon checkboxIcon-checked"></i>
-                            <i class="md-icon checkboxIcon checkboxIcon-unchecked"></i>
-                        </span>
+                        
                     </label>
                     <p>Turning off realtime monitoring will take three seconds to shut down.</p>
                 </div>
-            </div>
-            <div id="downloadSpeedChartContainer" style="position:relative;width: 75%; padding-right:2em">
+            </form>
+            <div id="downloadSpeedChartContainer" style="position:relative; margin: 0 5em; height:20em">
                 <canvas id="downloadSpeedChart"></canvas>
             </div>
         </div>
