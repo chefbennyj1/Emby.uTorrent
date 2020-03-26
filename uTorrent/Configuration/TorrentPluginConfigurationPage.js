@@ -77,7 +77,7 @@
             dlg.classList.add("formDialog");
             dlg.classList.add("ui-body-a");
             dlg.classList.add("background-theme-a");
-            dlg.style = "margin:2em; max-width: 25em; max-height:22em";
+            dlg.style = "margin:2em; max-width: 25em; max-height:35em";
 
             var html = '';
             html += '<div class="formDialogHeader" style="display:flex">';
@@ -90,30 +90,30 @@
             html += '<div style="flex-grow:1;margin:3em">';
 
             html += '<label for="ip">Ip Address</label>';
-            html += '<input id="ip" name="ip" is="emby-input" />';
+            html += '<input id="ip" name="ip" class="emby-input" />';
 
             html += '<label for="port">Port</label>';
             html += '<input id="port" name="port" is="emby-input" />';
 
             html += '<label for="name">User Name</label>';
-            html += '<input id="user" name="name" is="emby-input" />';
+            html += '<input id="user" name="name" class="emby-input" />';
 
             html += '<label for="pass">Password</label>';
-            html += '<input id="pass" name="pass" type="password" is="emby-input" />';
+            html += '<input id="pass" name="pass" type="password" class="emby-input" />';
 
             html += '<label for="finishedDownloadLocation">Finished Download Location</label>';
-            html += '<input id="finishedDownloadLocation" name="finishedDownloadLocation" is="emby-input" />';
-
-
-            html += '<div class="formDialogFooter" style="padding-top:2.5em">';
-            html += '<button id="saveButton" class="raised button-submit block emby-button" style="width:50%; margin:auto;" is="emby-button">Save</button>';
+            html += '<input id="finishedDownloadLocation" name="finishedDownloadLocation" class="emby-input"/>';
+             
+            html += '<button id="saveButton" class="raised button-submit block emby-button" style="width:50%; margin:auto; margin-top:2em" is="emby-button">Save</button>';
 
             html += '</div>';
             html += '</div>';
-            html += '</div>';
+
             dlg.innerHTML = html;
 
-            loadConfig(dlg);
+            
+
+            
 
             dlg.querySelector('#saveButton').addEventListener('click',
                 () => {
@@ -122,7 +122,7 @@
                         password: dlg.querySelector('#pass').value,
                         ipAddress: dlg.querySelector('#ip').value,
                         port: dlg.querySelector('#port').value,
-                        FinishedDownloadsLocation: dlg.querySelector('#finishedDownloadLocation').value,
+                        FinishedDownloadsLocation: dlg.querySelector('#finishedDownloadLocation').value
 
                     }
 
@@ -139,10 +139,20 @@
             dlg.querySelector('.btnCloseDialog').addEventListener('click',
                 () => {
                     dialogHelper.close(dlg);
+                }); 
+            ApiClient.getPluginConfiguration(pluginId).then(
+                (config) => {
+                    if (config.userName) {
+                        dlg.querySelector('#user').value = config.userName;
+                        dlg.querySelector('#pass').value = config.password;
+                        dlg.querySelector('#ip').value = config.ipAddress;
+                        dlg.querySelector('#port').value = config.port;
+                        dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation;
+                    }
+                    loading.hide();
+                    dialogHelper.open(dlg);
                 });
-
-            dialogHelper.open(dlg);
-            loading.hide();
+            
         }
 
         function getTorrentResultTableHtml(torrents) {
@@ -337,12 +347,13 @@
                         (result) => {
                             view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(result.torrents);
 
+                            
                             if (downloadChartData.length > 5) {
                                 downloadChartData.splice(0, 1);
                                 uploadChartData.splice(0, 1);
                                 c.data.labels.splice(0, 1);
                             }
-
+                             
                             c.data.datasets[0].data.push(parseInt(result.sizeDownload, 10));
                             c.data.datasets[1].data.push(parseInt(result.sizeUpload, 10));
 
@@ -350,7 +361,7 @@
 
                             c.data.datasets[0].label = "Download Speed (" + result.sizeSuffixDownload + ")";
                             c.data.datasets[1].label = "Upload Speed (" + result.sizeSuffixUpload + ")";
-                            c.update(0);
+                            c.update();
                              
                             view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
                             if (realTimeMonitor === true) {
@@ -466,7 +477,7 @@
                         datasets: [{
                             label: 'Download Speed',
                             borderColor: "#4584b5",
-                            fill: false,
+                            fill: true,
                             data: [0]
                         }, {
                             label: 'Upload Speed',
@@ -501,7 +512,7 @@
                         () => {
                             loading.show();
                             openSettingsDialog(view);
-                            loading.hide();
+                            
                         });
 
                     view.querySelector('#openAddTorrentDialog').addEventListener('click',
