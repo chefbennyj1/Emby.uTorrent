@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using MediaBrowser.Common.Net;
 using uTorrent.Api;
 using uTorrent.Helpers;
@@ -138,8 +137,7 @@ namespace uTorrent
         private string list  => "&list=1";
         private string token => "token=";
         private string cache => "&cid=";
-
-
+        
         
         public UTorrentService(IJsonSerializer json, IHttpClient client)
         {
@@ -244,8 +242,8 @@ namespace uTorrent
             try
             {
                 const string endpoint = "&action=add-url&s=";
-                var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                var url               = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+                var httpWebRequest    = (HttpWebRequest)WebRequest.Create(url);
 
                 httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";

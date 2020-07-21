@@ -1,4 +1,4 @@
-﻿define(["loading", "dialogHelper"],
+﻿define(["loading", "dialogHelper", "formDialogStyle"],
     function (loading, dialogHelper) {
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
@@ -112,7 +112,8 @@
             dlg.innerHTML = html;
 
             
-
+            loading.hide();
+            dialogHelper.open(dlg);
             
 
             dlg.querySelector('#saveButton').addEventListener('click',
@@ -149,8 +150,7 @@
                         dlg.querySelector('#port').value = config.port;
                         dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation;
                     }
-                    loading.hide();
-                    dialogHelper.open(dlg);
+                    
                 });
             
         }
@@ -159,32 +159,31 @@
             var html = '';
             torrents.forEach(torrent => {
 
-                html += '<tr class="detailTableBodyRow detailTableBodyRow-shaded" id="' + torrent.Hash + '">';
-
+                html += '<tr class="detailTableBodyRow detailTableBodyRow-shaded" id="' + torrent.Hash + '">'; 
                 html += '<td class="detailTableBodyCell" data-title="Status">';
                 html += '<i class="md-icon"';
 
                 if (torrent.Progress == 1000) {
+
                     html += 'style="color:green; font-size:2em">check';
+
                 } else {
+
                     switch (torrent.Status) {
-                        case 'started':
-                            html += 'style="color:#4584b5; font-size:2em; font-weight:light; cursor:default">play_arrow';
+                        case 'started' : html += 'style="color:#4584b5; font-size:2em; font-weight:light; cursor:default">play_arrow';
                             break;
-                        case 'stopped':
-                            html += 'style="color:red; font-size:2em; font-weight:light;cursor:default">stop';
+                        case 'stopped' : html += 'style="color:red; font-size:2em; font-weight:light;cursor:default">stop';
                             break;
-                        case 'paused':
-                            html += 'style="color:orange; font-size:2em; font-weight:light;cursor:default">paused';
+                        case 'paused'  : html += 'style="color:orange; font-size:2em; font-weight:light;cursor:default">paused';
                             break;
-                        case 're-check':
-                            html += 'style="color:orange; font-size:2em; font-weight:light;cursor:default">sync';
+                        case 're-check': html += 'style="color:orange; font-size:2em; font-weight:light;cursor:default">sync';
                             break;
-                        case "queued":
-                            html += 'style="color:#4584b5; font-size:2em; font-weight:light;cursor:default">restore';
+                        case "queued"  : html += 'style="color:#4584b5; font-size:2em; font-weight:light;cursor:default">restore';
                             break;
                     }
+
                 }
+
                 html += '</i></td>';
                 html += '<td data-title="Name" class="detailTableBodyCell fileCell">' + torrent.Name + '</td>';
                 html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
@@ -201,8 +200,10 @@
                 html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + torrent.Eta + '</td>';
                 html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
                 html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
+
                 html += '</tr>';
             });
+
             return html;
         }
 
@@ -225,7 +226,7 @@
 
         function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
-                if (token == null ) {
+                if (token == null) {
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
@@ -243,44 +244,43 @@
                             resolve(torrentData);
                         });
                     });
-                }
-              
-                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                    token +
-                    "&IpAddress=" +
-                    config.ipAddress +
-                    "&Port=" +
-                    config.port +
-                    "&UserName=" +
-                    encodeURIComponent(config.userName) +
-                    "&Password=" +
-                    encodeURIComponent(config.password) +
-                    "&SortBy=" +
-                    sortBy)).then((torrentData) => {
 
-                    resolve(torrentData);
-                        
-                    },
-                    () => {
-                    getToken(config).then(t => {
-                        token = t;
-                        ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                            encodeURIComponent(token) +
-                            "&IpAddress=" +
-                            config.ipAddress +
-                            "&Port=" +
-                            config.port +
-                            "&UserName=" +
-                            encodeURIComponent(config.userName) +
-                            "&Password=" +
-                            encodeURIComponent(config.password) +
-                            "&SortBy=" +
-                            sortBy)).then((torrentData) => {
+                } else {
+
+                    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                        token +
+                        "&IpAddress=" +
+                        config.ipAddress +
+                        "&Port=" +
+                        config.port +
+                        "&UserName=" +
+                        encodeURIComponent(config.userName) +
+                        "&Password=" +
+                        encodeURIComponent(config.password) +
+                        "&SortBy=" +
+                        sortBy)).then((torrentData) => { 
                             resolve(torrentData);
+                        },
+                        () => {
+                            getToken(config).then(t => {
+                                token = t;
+                                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                                    encodeURIComponent(token) +
+                                    "&IpAddress=" +
+                                    config.ipAddress +
+                                    "&Port=" +
+                                    config.port +
+                                    "&UserName=" +
+                                    encodeURIComponent(config.userName) +
+                                    "&Password=" +
+                                    encodeURIComponent(config.password) +
+                                    "&SortBy=" +
+                                    sortBy)).then((torrentData) => {
+                                    resolve(torrentData);
+                                });
+                            });
                         });
-                    });
-                });
-               
+                }
             });
         }
            
@@ -330,11 +330,13 @@
 
         function loadDialogData(dlg, config) {
             if (config.userName) {
-                dlg.querySelector('#user').value = config.userName;
-                dlg.querySelector('#pass').value = config.password;
-                dlg.querySelector('#ip').value = config.ipAddress;
-                dlg.querySelector('#port').value = config.port;
+
+                dlg.querySelector('#user').value                     = config.userName;
+                dlg.querySelector('#pass').value                     = config.password;
+                dlg.querySelector('#ip').value                       = config.ipAddress;
+                dlg.querySelector('#port').value                     = config.port;
                 dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation; 
+
             }
 
         }
@@ -346,7 +348,6 @@
                     getUTorrentData(config, "DateAdded").then(
                         (result) => {
                             view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(result.torrents);
-
                             
                             if (downloadChartData.length > 5) {
                                 downloadChartData.splice(0, 1);
@@ -364,6 +365,7 @@
                             c.update();
                              
                             view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
+
                             if (realTimeMonitor === true) {
                                 setTimeout(updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view), 2000);
                             }
@@ -373,34 +375,17 @@
                 });
         }
 
-        function enableRealTimeMonitoring(view) {
-            require([Dashboard.getConfigurationResourceUrl('Chart.bundle.js')],
-                (chart) => {
-                    var c = drawDownloadChart(view, chart);
-                    var downloadChartData = c.data.datasets[0].data;
-                    var uploadChartData   = c.data.datasets[1].data;
-                    var chartLabels       = c.data.labels;
-                    updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view);
-                    loading.hide();
-                });
-        }
-
+        
         function loadPageData(view, config) {
             if (config.userName) {
-                if (config.EnableRealtimeMonitoring) {
-                    enableRealTimeMonitoring(view);
-                    view.querySelector('#enableRealTimeMonitoring').checked = config.EnableRealtimeMonitoring;
-                    realTimeMonitor = config.EnableRealtimeMonitoring;
+
+                getUTorrentData(config, "DateAdded").then((results) => {
+                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                     loading.hide();
-                    return;
-                } else {
-                    getUTorrentData(config, "DateAdded").then((results) => {
-                        view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                        view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
-                        loading.hide();
-                    });
-                }
+
+                });
             }
+
             loading.hide();
         }
 
@@ -415,89 +400,7 @@
                 });
         }
 
-        function tableItemClick(table, config) {
-            table.querySelectorAll('i.md-icon').forEach(item => {
-
-                item.addEventListener('click', (e) => {
-                    clearInterval(torrentMonitor);
-                    var id = e.target.closest('.detailTableBodyRow').id;
-
-                    getDownloadingTorrents(config).then((torrents) => {
-
-                        torrents.forEach(torrent => {
-
-                            if (torrent.Hash !== id) return;
-
-                            switch (torrent.Status) {
-                                case "started":
-                                    remoteControlTorrent("StopTorrent", id, config).then(
-                                        (response) => {
-                                            console.log("torrent stopped " + response.status);
-                                        });
-
-                                    torrentMonitor = setInterval(() => {
-                                        getDownloadingTorrents(config).then((torrents) => {
-                                            table.innerHTML =
-                                                getTorrentResultTableHtml(torrents);
-                                        });
-                                    },
-                                        5000);
-                                    break;
-
-                                case "stopped":
-                                    remoteControlTorrent("StartTorrent", id, config).then(
-                                        (response) => {
-                                            console.log("torrent started " + response.status);
-                                        });
-                                    torrentMonitor = setInterval(() => {
-                                        getDownloadingTorrents(config).then((torrents) => {
-                                            table.innerHTML =
-                                                getTorrentResultTableHtml(torrents);
-                                        });
-                                    },
-                                        5000);
-                                    break;
-
-                            }
-                        });
-                    });
-
-                });
-
-            });
-        }
-
-        function drawDownloadChart(view, Chart) { 
-            var ctx = view.querySelector('#downloadSpeedChart').getContext("2d");
-            return new Chart(ctx,
-                {
-                    type: 'line',
-                    data: {
-                        labels: [new Date().getSeconds()],
-                        datasets: [{
-                            label: 'Download Speed',
-                            borderColor: "#4584b5",
-                            fill: true,
-                            data: [0]
-                        }, {
-                            label: 'Upload Speed',
-                            borderColor: "#D4AF37",
-                            fill: false,
-                            data: [0]
-                            }]
-                    },
-                    options: {
-                        title: {
-                            display: true
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
-
-
-        }
-
+       
         return function (view) {
             view.addEventListener('viewshow',
                 () => { 
@@ -509,7 +412,8 @@
                     loadConfig(view);
 
                     view.querySelector('#openTorrentDialog').addEventListener('click',
-                        () => {
+                        (e) => {
+                            e.preventDefault();
                             loading.show();
                             openSettingsDialog(view);
                             
@@ -517,21 +421,9 @@
 
                     view.querySelector('#openAddTorrentDialog').addEventListener('click',
                         () => {
+                            e.preventDefault();
                             openAddTorrentDialog();
-                        });
-
-                    view.querySelector('#enableRealTimeMonitoring').addEventListener('change',
-                        () => { 
-                            realTimeMonitor = view.querySelector('#enableRealTimeMonitoring').checked;
-                            ApiClient.getPluginConfiguration(pluginId).then(
-                                (config) => {
-                                    config.EnableRealtimeMonitoring = view.querySelector('#enableRealTimeMonitoring').checked;
-
-                                    ApiClient.updatePluginConfiguration(pluginId, config).then(() => {
-                                        loadPageData(view, config);
-                                    });
-                                });
-                        });
+                        });  
 
                 });
 

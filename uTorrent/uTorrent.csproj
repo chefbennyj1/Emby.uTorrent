@@ -11,14 +11,12 @@
 </PropertyGroup>
 
 <ItemGroup>
-  <None Remove="Configuration\Chart.bundle.js" />
   <None Remove="Configuration\TorrentPluginConfigurationPage.html" />
   <None Remove="Configuration\TorrentPluginConfigurationPage.js" />
   <None Remove="thumb.jpg" />
 </ItemGroup>
 
 <ItemGroup>
-  <EmbeddedResource Include="Configuration\Chart.bundle.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginConfigurationPage.html" />
   <EmbeddedResource Include="Configuration\TorrentPluginConfigurationPage.js" />
   <EmbeddedResource Include="thumb.jpg" />
