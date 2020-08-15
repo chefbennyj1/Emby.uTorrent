@@ -28,7 +28,7 @@ namespace uTorrent.Api
                 UploadSpeed           = t[8].ToString(),
                 DownloadSpeedFriendly = FileSizeConversions.SizeSuffix(Convert.ToInt64(t[9])),
                 DownloadSpeed         = t[9].ToString(),
-                Eta                   = t[10].ToString() == "0" ? t[1].ToString() != "130" ? "Complete" : "Checking" : (Convert.ToInt32(t[10].ToString()) / 60).ToString() + " minute(s)",
+                Eta                   = Convert.ToInt32(t[10]) <= 0 ? t[1].ToString().Trim() != "130" ? "Complete" : "Checking" : (Convert.ToInt32(t[10].ToString()) / 60).ToString() + " minute(s)",
                 Label                 = t[11].ToString(),
                 PeersConnected        = t[12].ToString(),
                 PeersInSwarm          = t[13].ToString(),

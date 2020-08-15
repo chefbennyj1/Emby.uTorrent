@@ -193,7 +193,7 @@ namespace uTorrent
                         var totalDownloadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.DownloadSpeed))).Split(' ');
                         var totalUploadRate   = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
 
-                        return JsonSerializer.SerializeToString(new UTorrentService.TorrentData()
+                        return JsonSerializer.SerializeToString(new TorrentData()
                         {
                             torrents                 = torrents,
                             sizeDownload             = totalDownloadRate[0],

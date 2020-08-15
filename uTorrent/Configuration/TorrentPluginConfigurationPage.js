@@ -374,19 +374,18 @@
                        
                 });
         }
-
-        
+          
         function loadPageData(view, config) {
             if (config.userName) {
 
-                getUTorrentData(config, "DateAdded").then((results) => {
+                loading.show();
+
+                getUTorrentData(config, "DateAdded").then((results) => { 
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                    loading.hide();
-
                 });
-            }
 
-            loading.hide();
+                loading.hide();
+            }  
         }
 
         function loadConfig(view) {
@@ -404,9 +403,7 @@
         return function (view) {
             view.addEventListener('viewshow',
                 () => { 
-
-                    loading.show();
-
+                        
                     token = null; //rest the token
 
                     loadConfig(view);
