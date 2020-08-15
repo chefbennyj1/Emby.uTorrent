@@ -49,6 +49,8 @@ namespace uTorrent.Api
             return list.ToList();
         }
         
+        //Older versions of uTorrent doesn't have the date added parameter return in the API.
+        //We'll use the creation time of the file to get the added date for our service
         private static string getAddedDate(string dir, string torrentName)
         {
             try { 
