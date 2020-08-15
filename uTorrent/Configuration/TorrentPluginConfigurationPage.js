@@ -69,9 +69,9 @@
             loading.show();
 
             var dlg = dialogHelper.createDialog({
-                size: "medium-tall",
-                removeOnClose: !1,
-                scrollY: true
+                size          : "medium-tall",
+                removeOnClose : !1,
+                scrollY       : true
             });
 
             dlg.classList.add("formDialog");
@@ -119,11 +119,11 @@
             dlg.querySelector('#saveButton').addEventListener('click',
                 () => {
                     var config = {
-                        userName: dlg.querySelector('#user').value,
-                        password: dlg.querySelector('#pass').value,
-                        ipAddress: dlg.querySelector('#ip').value,
-                        port: dlg.querySelector('#port').value,
-                        FinishedDownloadsLocation: dlg.querySelector('#finishedDownloadLocation').value
+                        userName                  : dlg.querySelector('#user').value,
+                        password                  : dlg.querySelector('#pass').value,
+                        ipAddress                 : dlg.querySelector('#ip').value,
+                        port                      : dlg.querySelector('#port').value,
+                        FinishedDownloadsLocation : dlg.querySelector('#finishedDownloadLocation').value
 
                     }
 
@@ -144,10 +144,10 @@
             ApiClient.getPluginConfiguration(pluginId).then(
                 (config) => {
                     if (config.userName) {
-                        dlg.querySelector('#user').value = config.userName;
-                        dlg.querySelector('#pass').value = config.password;
-                        dlg.querySelector('#ip').value = config.ipAddress;
-                        dlg.querySelector('#port').value = config.port;
+                        dlg.querySelector('#user').value                     = config.userName;
+                        dlg.querySelector('#pass').value                     = config.password;
+                        dlg.querySelector('#ip').value                       = config.ipAddress;
+                        dlg.querySelector('#port').value                     = config.port;
                         dlg.querySelector('#finishedDownloadLocation').value = config.FinishedDownloadsLocation;
                     }
                     
@@ -412,8 +412,7 @@
                         (e) => {
                             e.preventDefault();
                             loading.show();
-                            openSettingsDialog(view);
-                            
+                            openSettingsDialog(view); 
                         });
 
                     view.querySelector('#openAddTorrentDialog').addEventListener('click',
