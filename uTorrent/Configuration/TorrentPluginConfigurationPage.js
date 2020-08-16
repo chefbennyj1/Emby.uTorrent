@@ -342,14 +342,17 @@
         }
 
         function updateTorrentResultTable(view, config) {
-            setTimeout(() => {
+            if (uTorrentProgressIntervalUpdate) {
+                setTimeout(() => {
 
-                getUTorrentData(config, "DateAdded").then((results) => {
-                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                    updateTorrentResultTable(view, config);
-                });
+                    getUTorrentData(config, "DateAdded").then((results) => {
+                        view.querySelector('.torrentResultBody').innerHTML =
+                            getTorrentResultTableHtml(results.torrents);
+                        updateTorrentResultTable(view, config);
+                    });
 
-            },  2000);
+                }, 2000);
+            }
         }
         
         function loadPageData(view, config) {
@@ -361,6 +364,7 @@
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                 });
 
+                uTorrentProgressIntervalUpdate = true;
                 updateTorrentResultTable(view, config);
 
                 loading.hide();
@@ -403,11 +407,11 @@
                 });
 
             view.addEventListener('viewhide', () => {
-                clearInterval(uTorrentProgressIntervalUpdate); 
+                uTorrentProgressIntervalUpdate = false;
             });
 
             view.addEventListener('viewdestroy', () => {
-                clearInterval(uTorrentProgressIntervalUpdate);
+                uTorrentProgressIntervalUpdate = false;
             });
 
         }
