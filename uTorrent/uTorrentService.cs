@@ -172,20 +172,23 @@ namespace uTorrent
                         
                         CacheId     = results.torrentc;
 
-                        //torrents count 0 means first request
-                        //torrentsp are only items returned that have changed since the last request
-                        //using the cacheId from the prior request
+                        //List<Torrent> torrents count would be empty on our first request
+                        //We fill our "torrents" list with the entire torrent data from the API.
+
+                        //"torrentp" results are only items that have changed since the last request using the cacheId from the prior request
+
+                        //This means we have to replace the data stored in our "List<Torrent> torrents" which matches the new data returned in torrentp list from the api.
 
                         var torrentListChanges = 
                             TorrentParser.ParseTorrentListInfo(torrents.Count <= 0 ? results.torrents : results.torrentp, request.SortBy);
 
                         if (torrents.Count <= 0)
                         {
-                            torrents = torrentListChanges; //First update request would hold all the torrents, add them all to the master list.
+                            torrents = torrentListChanges; // add torrents to the master list.
                         }
                         else
                         {
-                            //Should remove any torrent data that has changed from the master list by comparing torrent Hash's
+                            //Remove any torrent data that has changed from the master list by comparing torrent Hash's
                             torrents = torrents.Where(t1 => torrentListChanges.Any(t2 => t1.Hash != t2.Hash)).ToList();
                             torrents.AddRange(torrentListChanges); //Add the new data to the master list
                         }
@@ -202,7 +205,6 @@ namespace uTorrent
                             sizeSuffixUpload         = totalUploadRate[1],
                             sizeTotalDriveSpace      = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt64(t.TotalBytes))),
                             sizeTotalDriveSpaceBytes = torrents.Sum(t => Convert.ToInt64(t.TotalBytes)).ToString()
-
                         });
                     }
                 }

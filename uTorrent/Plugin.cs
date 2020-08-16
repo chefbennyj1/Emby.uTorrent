@@ -27,14 +27,14 @@ namespace uTorrent
             {
                 new PluginPageInfo
                 {
-                    Name = "TorrentPluginConfigurationPage",
+                    Name                 = "TorrentPluginConfigurationPage",
                     EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginConfigurationPage.html",
-                    EnableInMainMenu = true,
-                    DisplayName = "µTorrent"
+                    EnableInMainMenu     = true,
+                    DisplayName          = "µTorrent"
                 },
                 new PluginPageInfo()
                 {
-                    Name = "TorrentPluginConfigurationPageJS",
+                    Name                 = "TorrentPluginConfigurationPageJS",
                     EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginConfigurationPage.js",
                 }
             };

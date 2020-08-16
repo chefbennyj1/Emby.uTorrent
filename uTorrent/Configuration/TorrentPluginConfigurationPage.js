@@ -3,10 +3,10 @@
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
         
-        var realTimeMonitor; //Interval Timer to update download speed chart data for real time monitoring every 1.5 seconds
-
         var token = null;
-        
+
+        var uTorrentProgressIntervalUpdate;
+
         function openAddTorrentDialog() {
             loading.show();
 
@@ -340,41 +340,18 @@
             }
 
         }
-           
-        function updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view) {
-            ApiClient.getPluginConfiguration(pluginId).then(
-                (config) => { 
 
-                    getUTorrentData(config, "DateAdded").then(
-                        (result) => {
-                            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(result.torrents);
-                            
-                            if (downloadChartData.length > 5) {
-                                downloadChartData.splice(0, 1);
-                                uploadChartData.splice(0, 1);
-                                c.data.labels.splice(0, 1);
-                            }
-                             
-                            c.data.datasets[0].data.push(parseInt(result.sizeDownload, 10));
-                            c.data.datasets[1].data.push(parseInt(result.sizeUpload, 10));
+        function updateTorrentResultTable(view, config) {
+            setTimeout(() => {
 
-                            c.data.labels.push(new Date().getSeconds());
-
-                            c.data.datasets[0].label = "Download Speed (" + result.sizeSuffixDownload + ")";
-                            c.data.datasets[1].label = "Upload Speed (" + result.sizeSuffixUpload + ")";
-                            c.update();
-                             
-                            view.querySelector('#torrentListHeader').innerHTML = "Torrents By Date Added: " + result.sizeTotalDriveSpace;
-
-                            if (realTimeMonitor === true) {
-                                setTimeout(updateTorrentData(downloadChartData, uploadChartData, chartLabels, c, view), 2000);
-                            }
-                            
-                        });
-                       
+                getUTorrentData(config, "DateAdded").then((results) => {
+                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+                    updateTorrentResultTable(view, config);
                 });
+
+            },  2000);
         }
-          
+        
         function loadPageData(view, config) {
             if (config.userName) {
 
@@ -383,6 +360,8 @@
                 getUTorrentData(config, "DateAdded").then((results) => { 
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                 });
+
+                updateTorrentResultTable(view, config);
 
                 loading.hide();
             }  
@@ -424,11 +403,11 @@
                 });
 
             view.addEventListener('viewhide', () => {
-                realTimeMonitor = false;
+                clearInterval(uTorrentProgressIntervalUpdate); 
             });
 
             view.addEventListener('viewdestroy', () => {
-                realTimeMonitor = false;
+                clearInterval(uTorrentProgressIntervalUpdate);
             });
 
         }
