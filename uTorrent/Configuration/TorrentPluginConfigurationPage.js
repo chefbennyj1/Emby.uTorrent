@@ -5,7 +5,7 @@
         
         var token = null;
 
-        var uTorrentProgressIntervalUpdate;
+        var uTorrentProgressIntervalUpdate; //Only request torrent data when the page is shown on the screen
 
         function openAddTorrentDialog() {
             loading.show();
@@ -345,9 +345,10 @@
             if (uTorrentProgressIntervalUpdate) {
                 setTimeout(() => {
 
-                    getUTorrentData(config, "DateAdded").then((results) => {
-                        view.querySelector('.torrentResultBody').innerHTML =
-                            getTorrentResultTableHtml(results.torrents);
+                    getUTorrentData(config, "DateAdded").then((results) => {  
+                        view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+                        view.querySelector('.torrentInfoContainer > h2').innerText = results.torrents.length +' torrents';
+                        console.log("uTorrent data updated");
                         updateTorrentResultTable(view, config);
                     });
 

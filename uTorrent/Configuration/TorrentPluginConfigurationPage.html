@@ -1,22 +1,23 @@
 ﻿
-<div data-role="page" style="align-items: center; margin: auto; padding: 3em; top:4em" class="type-interior pluginConfigurationPage TorrentPluginConfigurationPage" data-require="emby-button,emby-input,emby-select" data-controller="__plugin/TorrentPluginConfigurationPageJS">
+<div data-role="page" style="align-items: center; margin: auto; padding: 3em;" class="type-interior pluginConfigurationPage TorrentPluginConfigurationPage" data-require="emby-button,emby-input,emby-select" data-controller="__plugin/TorrentPluginConfigurationPageJS">
     <div class="content-primary">
-        <div style="display:block">
-            <form style="margin-top: 2em;margin-bottom: 2em;flex-grow:1;padding-right: 3em;">
+        <h2 class="sectionTitle sectionTitle-cards">µTorrent</h2>
+        <div style="display: block">
+            <form style="margin-top: 2em; margin-bottom: 2em; flex-grow: 1; padding-right: 3em;">
                 <div class="detailSectionHeader">
                     <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">uTorrent credentials</h2>
                     <button is="emby-button" id="openTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">link</i></button>
                 </div>
-                <br />
+                <br/>
                 <div class="detailSectionHeader">
                     <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
                     <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
                 </div>
             </form>
-           
         </div>
-        <br />
-
+       
+        
+        <div class="torrentInfoContainer"><h2></h2></div>
 
         <div class="scrollY" style="max-height: 30em">
 
@@ -31,7 +32,7 @@
                         <th class="detailTableHeaderCell" data-priority="1" style="width: 35%">Progress</th>
                         <th class="detailTableHeaderCell" data-priority="1" style="width: 4.55%">Complete</th>
                         <th class="detailTableHeaderCell" data-priority="1">ETA</th>
-                        <th class="detailTableHeaderCell" data-priority="1">Date Added</th>
+                        <th class="detailTableHeaderCell" data-priority="1">Date Completed</th>
                         <th class="detailTableHeaderCell" data-priority="1"></th>
                     </tr>
 
