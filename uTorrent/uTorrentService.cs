@@ -241,10 +241,16 @@ namespace uTorrent
 
         public string Get(AddTorrentUrl request)
         {
+            var config = Plugin.Instance.Configuration;
+            if (config.userName is null)
+            {
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                    { status = "No configuration present" }); 
+            }
             try
             {
                 const string endpoint = "&action=add-url&s=";
-                var url               = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+                var url               = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}{request.Url}";
                 var httpWebRequest    = (HttpWebRequest)WebRequest.Create(url);
 
                 httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);

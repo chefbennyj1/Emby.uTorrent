@@ -49,7 +49,13 @@
                 () => {
                     ApiClient.getPluginConfiguration(pluginId).then((config) => {
                         if (!config.userName) return;
-                        addTorrentUrl(dlg.querySelector('#torrentUrl').value, config).then(() => {
+                        addTorrentUrl(dlg.querySelector('#torrentUrl').value, config).then((result) => {
+                            if (result == "OK") {
+                                Dashboard.alert({
+                                    title: "Torrent Added Successfully",
+                                    message: ""
+                                });
+                            }
                             dialogHelper.close(dlg);
                         });
                     });
@@ -77,7 +83,7 @@
             dlg.classList.add("formDialog");
             dlg.classList.add("ui-body-a");
             dlg.classList.add("background-theme-a");
-            dlg.style = "margin:2em; max-width: 25em; max-height:35em";
+            dlg.style = "margin:2em; max-width: 70em; max-height:38em";
 
             var html = '';
             html += '<div class="formDialogHeader" style="display:flex">';
@@ -321,7 +327,7 @@
                         "&Password=" +
                         encodeURIComponent(config.password) +
                         "&Url=" +
-                        url)).then((result) => {
+                        encodeURIComponent(url))).then((result) => {
                             resolve(result.status);
                         });
                 });
@@ -358,9 +364,7 @@
         
         function loadPageData(view, config) {
             if (config.userName) {
-
-                loading.show();
-
+                
                 getUTorrentData(config, "DateAdded").then((results) => { 
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                 });
@@ -368,7 +372,7 @@
                 uTorrentProgressIntervalUpdate = true;
                 updateTorrentResultTable(view, config);
 
-                loading.hide();
+                Dashboard.hideLoadingMsg();
             }  
         }
 
@@ -386,8 +390,8 @@
        
         return function (view) {
             view.addEventListener('viewshow',
-                () => { 
-                        
+                () => {
+                    Dashboard.showLoadingMsg(); 
                     token = null; //rest the token
 
                     loadConfig(view);
@@ -400,7 +404,7 @@
                         });
 
                     view.querySelector('#openAddTorrentDialog').addEventListener('click',
-                        () => {
+                        (e) => {
                             e.preventDefault();
                             openAddTorrentDialog();
                         });  
