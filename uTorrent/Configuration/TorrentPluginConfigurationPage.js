@@ -203,7 +203,7 @@
                 html += '</div>';
                 html += '</td>';
                 html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
-                html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + torrent.Eta + '</td>';
+                html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Status == "queued" ? "Queued" : torrent.Eta) + '</td>';
                 html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
                 html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
 
@@ -225,6 +225,60 @@
                         "&Port=" +
                         config.port)).then((result) => {
                             resolve(result.token);
+                        });
+                }
+            });
+        }
+
+        function getSettings(config) {
+            return new Promise((resolve, reject) => {
+                  if (token == null) {
+                    getToken(config).then(t => {
+                        token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
+                            token +
+                            "&IpAddress=" +
+                            config.ipAddress +
+                            "&Port=" +
+                            config.port +
+                            "&UserName=" +
+                            encodeURIComponent(config.userName) +
+                            "&Password=" +
+                            encodeURIComponent(config.password))).then((settingsData) => {
+                            resolve(settingsData);
+                        });
+                    });
+
+                } else {
+
+                    ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
+                        token +
+                        "&IpAddress=" +
+                        config.ipAddress +
+                        "&Port=" +
+                        config.port +
+                        "&UserName=" +
+                        encodeURIComponent(config.userName) +
+                        "&Password=" +
+                        encodeURIComponent(config.password))).then((settingsData) => { 
+                            resolve(settingstData);
+                        },
+                        () => {
+                            getToken(config).then(t => {
+                                token = t;
+                                ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
+                                    encodeURIComponent(token) +
+                                    "&IpAddress=" +
+                                    config.ipAddress +
+                                    "&Port=" +
+                                    config.port +
+                                    "&UserName=" +
+                                    encodeURIComponent(config.userName) +
+                                    "&Password=" +
+                                    encodeURIComponent(config.password))).then((settingsData) => {
+                                    resolve(settingsData);
+                                });
+                            });
                         });
                 }
             });
@@ -347,6 +401,15 @@
 
         }
 
+        function loadSelectSpeedOptions() {
+            var html = '';
+            html += '<option value="0">Unlimited</option>';
+            for (var i = 25; i <= 1000; i += 25) {
+                html += '<option value="' + i + '">' + i + 'KB/s</option>';
+            }
+            return html;
+        }
+
         function updateTorrentResultTable(view, config) {
             if (uTorrentProgressIntervalUpdate) {
                 setTimeout(() => {
@@ -371,6 +434,22 @@
 
                 uTorrentProgressIntervalUpdate = true;
                 updateTorrentResultTable(view, config);
+
+                getSettings(config).then(results => {
+                    var settings = results.settings;
+                    console.log(settings[26]);  //UP
+                    console.log(settings[25]); //DL
+                    var upload = view.querySelector('#selectMaxUpload');
+                    upload.innerHTML = loadSelectSpeedOptions();
+                    var download = view.querySelector('#selectMaxDownload');
+                    download.innerHTML = loadSelectSpeedOptions();
+
+                    var settingsDownloadSpeed = settings[25];
+                    var settingsUploadSpeed = settings[26];
+
+                    download.value = settingsDownloadSpeed[2];
+                    upload.value = settingsUploadSpeed[2];
+                });
 
                 Dashboard.hideLoadingMsg();
             }  

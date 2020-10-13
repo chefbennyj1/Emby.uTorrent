@@ -114,6 +114,31 @@ namespace uTorrent
             public string sizeTotalDriveSpaceBytes { get; set; }
         }
 
+
+        [Route("/GetSettingsData", "GET", Summary = "Torrent List End Point")]
+        public class Settings : IReturn<string>
+        {
+            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Token { get; set; }
+            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string IpAddress { get; set; }
+            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Port { get; set; }
+            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string UserName { get; set; }
+            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
+            public string Password { get; set; }
+            
+
+            public string torrents_start_stopped { get; set; }
+            public string dir_active_download { get; set; }
+            public string dir_completed_download { get; set; }
+            public string max_dl_rate { get; set; }
+            public string max_ul_rate { get; set; }
+            public string max_active_downloads { get; set; }
+            public string max_active_torrent { get; set; }
+        }
+
         [Route("/GetToken", "GET", Summary = "Torrent Token End Point")]
         public class GetToken : IReturn<string>
         {
@@ -137,6 +162,7 @@ namespace uTorrent
         private string list  => "&list=1";
         private string token => "token=";
         private string cache => "&cid=";
+        private string getSettings => "&action=getsettings";
         
         
         public UTorrentService(IJsonSerializer json, IHttpClient client)
@@ -146,6 +172,26 @@ namespace uTorrent
         }
 
         // ReSharper disable MethodNameNotMeaningful
+
+        public string Get(Settings request)
+        {
+            var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{getSettings}";
+            var httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+            httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
+            using (var response = (HttpWebResponse) httpWebRequest.GetResponse())
+            {
+                if (response.StatusCode != HttpStatusCode.OK) return null;
+                using (var receiveStream = response.GetResponseStream())
+                {
+                    if (receiveStream == null) return null;
+                    using (var sr = new StreamReader(receiveStream,
+                        Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
 
         public string Get(TorrentData request)
         {

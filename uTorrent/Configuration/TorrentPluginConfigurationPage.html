@@ -6,7 +6,7 @@
                     <path d=" M 19.44 0.00 L 28.55 0.00 C 33.03 1.60 37.42 3.79 40.84 7.16 C 44.21 10.57 46.39 14.97 48.00 19.44 L 48.00 28.55 C 46.40 33.03 44.21 37.42 40.84 40.84 C 37.42 44.21 33.03 46.39 28.56 48.00 L 19.45 48.00 C 14.97 46.39 10.57 44.21 7.15 40.84 C 3.78 37.43 1.61 33.03 0.00 28.56 L 0.00 19.45 C 1.60 14.97 3.78 10.57 7.16 7.16 C 10.58 3.79 14.96 1.61 19.44 0.00 M 2.69 23.01 C 2.14 32.19 8.56 41.23 17.26 44.01 C 15.08 34.46 9.81 25.88 7.93 16.25 C 10.02 15.13 12.40 15.06 14.71 15.11 C 16.23 17.76 17.36 20.60 18.36 23.48 C 19.40 26.24 20.63 29.43 23.62 30.58 C 27.22 32.51 32.44 30.18 32.96 26.03 C 31.83 21.28 28.76 17.19 28.07 12.30 C 29.87 11.90 31.68 11.55 33.50 11.26 C 36.04 15.61 37.32 20.60 40.11 24.81 C 41.16 26.52 43.08 27.23 45.01 27.25 C 47.32 15.27 36.98 3.15 25.00 2.69 C 13.74 1.97 3.14 11.81 2.69 23.01 M 30.04 34.98 C 27.68 35.82 25.12 35.50 22.66 35.51 C 23.66 38.96 24.95 42.35 26.99 45.33 C 34.58 43.87 40.99 38.42 44.05 31.39 C 41.29 31.21 38.55 30.82 35.86 30.17 C 33.95 31.80 32.28 33.78 30.04 34.98 Z"></path>
                 </svg>
                 <h2 class="sectionTitle sectionTitle-cards" style="padding-bottom:2em">µTorrent</h2>
-                <hr/>
+                <hr />
                 <div style="display: block">
                     <div style="margin-top: 2em; margin-bottom: 2em; flex-grow: 1; padding-right: 3em; display:flex">
                         <div class="detailSectionHeader" style="margin:2em">
@@ -17,34 +17,60 @@
                             <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
                             <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
                         </div>
-                        <div class="torrentInfoContainer" style="padding-top: 1.25em;">
+                        <div class="torrentInfoContainer" style="padding-top: 1.25em;padding-right: 47%;">
                             <h2></h2>
                         </div>
+
                     </div>
                 </div>
-                <hr/>
+                <hr />
                 <div class="scrollY" style="max-height: 35em; margin:2em">
                     <table class="tblTorrentResults table detailTable" style="width: 100%;">
                         <thead>
-                        <tr style="text-align: left;">
-                            <th class="detailTableHeaderCell" data-priority="2" style="width: 5%">Status</th>
-                            <th class="detailTableHeaderCell" data-priority="3" style="width: 20%">Name</th>
-                            <th class="detailTableHeaderCell" data-priority="1" style="width: 5%">Size</th>
-                            <th class="detailTableHeaderCell" data-priority="1" style="width: 5%">Speed</th>
-                            <th class="detailTableHeaderCell" data-priority="1" style="width: 35%">Progress</th>
-                            <th class="detailTableHeaderCell" data-priority="1" style="width: 4.55%">Complete</th>
-                            <th class="detailTableHeaderCell" data-priority="1">ETA</th>
-                            <th class="detailTableHeaderCell" data-priority="1">Date Completed</th>
-                            <th class="detailTableHeaderCell" data-priority="1"></th>
-                        </tr>
+                            <tr style="text-align: left;">
+                                <th class="detailTableHeaderCell" data-priority="2" style="width: 5%">Status</th>
+                                <th class="detailTableHeaderCell" data-priority="3" style="width: 20%">Name</th>
+                                <th class="detailTableHeaderCell" data-priority="1" style="width: 5%">Size</th>
+                                <th class="detailTableHeaderCell" data-priority="1" style="width: 5%">Speed</th>
+                                <th class="detailTableHeaderCell" data-priority="1" style="width: 35%">Progress</th>
+                                <th class="detailTableHeaderCell" data-priority="1" style="width: 4.55%">Complete</th>
+                                <th class="detailTableHeaderCell" data-priority="1">ETA</th>
+                                <th class="detailTableHeaderCell" data-priority="1">Date Completed</th>
+                                <th class="detailTableHeaderCell" data-priority="1"></th>
+                            </tr>
                         </thead>
                         <tbody class="torrentResultBody"></tbody>
                     </table>
                 </div>
+                <hr />
+                <div style="padding: 2em;">
+                    <div class="detailSectionHeader personalizationConfiguration">
+                        <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Advanced</h2>
+                    </div>
+                    <div style="padding:2em">
+                        <div class="selectContainer fldMaxUploadSpeed">
+                            <label class="selectLabel" for="selectMaxUpload">Max upload speed:</label>
+                            <select is="emby-select" id="selectMaxUpload" label="Max upload speed:" class="emby-select-withcolor emby-select"></select>
+                            <div class="selectArrowContainer">
+                                <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding:2em">
+                        <div class="selectContainer fldMaxDownloadSpeed">
+                            <label class="selectLabel" for="selectMaxDownload">Max download speed:</label>
+                            <select is="emby-select" id="selectMaxDownload" label="Max download speed:" class="emby-select-withcolor emby-select"></select>
+                            <div class="selectArrowContainer">
+                                <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
             </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
 
