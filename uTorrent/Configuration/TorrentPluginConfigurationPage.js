@@ -230,9 +230,75 @@
             });
         }
 
+        function setSettings(setting, value, config) {
+            return new Promise((resolve, reject) => {
+                if (token == null) {
+                    getToken(config).then(t => {
+                        token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
+                            token +
+                            "&IpAddress=" +
+                            config.ipAddress +
+                            "&Port=" +
+                            config.port +
+                            "&UserName=" +
+                            encodeURIComponent(config.userName) +
+                            "&Password=" +
+                            encodeURIComponent(config.password) +
+                            "&SettingName=" +
+                            setting +
+                            "&SettingValue=" +
+                            value)).then((settingsData) => {
+                                resolve(settingsData);
+                            });
+                    });
+
+                } else {
+
+                    ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
+                        token +
+                        "&IpAddress=" +
+                        config.ipAddress +
+                        "&Port=" +
+                        config.port +
+                        "&UserName=" +
+                        encodeURIComponent(config.userName) +
+                        "&Password=" +
+                        encodeURIComponent(config.password) +
+                        "&SettingName=" +
+                        setting +
+                        "&SettingValue=" +
+                        value)).then((settingsData) => {
+                            resolve(settingsData);
+                        },
+                        () => {
+                            getToken(config).then(t => {
+                                token = t;
+                                ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
+                                    encodeURIComponent(token) +
+                                    "&IpAddress=" +
+                                    config.ipAddress +
+                                    "&Port=" +
+                                    config.port +
+                                    "&UserName=" +
+                                    encodeURIComponent(config.userName) +
+                                    "&Password=" +
+                                    encodeURIComponent(config.password) +
+                                    "&SettingName=" +
+                                    setting +
+                                    "&SettingValue=" +
+                                    value)).then((settingsData) => {
+                                        resolve(settingsData);
+                                    });
+                            });
+                        });
+                }
+            });
+        }
+
         function getSettings(config) {
             return new Promise((resolve, reject) => {
-                  if (token == null) {
+                if (token == null) {
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
@@ -245,8 +311,8 @@
                             encodeURIComponent(config.userName) +
                             "&Password=" +
                             encodeURIComponent(config.password))).then((settingsData) => {
-                            resolve(settingsData);
-                        });
+                                resolve(settingsData);
+                            });
                     });
 
                 } else {
@@ -260,26 +326,26 @@
                         "&UserName=" +
                         encodeURIComponent(config.userName) +
                         "&Password=" +
-                        encodeURIComponent(config.password))).then((settingsData) => { 
-                            resolve(settingstData);
+                        encodeURIComponent(config.password))).then((settingsData) => {
+                            resolve(settingsData);
                         },
-                        () => {
-                            getToken(config).then(t => {
-                                token = t;
-                                ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                                    encodeURIComponent(token) +
-                                    "&IpAddress=" +
-                                    config.ipAddress +
-                                    "&Port=" +
-                                    config.port +
-                                    "&UserName=" +
-                                    encodeURIComponent(config.userName) +
-                                    "&Password=" +
-                                    encodeURIComponent(config.password))).then((settingsData) => {
-                                    resolve(settingsData);
+                            () => {
+                                getToken(config).then(t => {
+                                    token = t;
+                                    ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
+                                        encodeURIComponent(token) +
+                                        "&IpAddress=" +
+                                        config.ipAddress +
+                                        "&Port=" +
+                                        config.port +
+                                        "&UserName=" +
+                                        encodeURIComponent(config.userName) +
+                                        "&Password=" +
+                                        encodeURIComponent(config.password))).then((settingsData) => {
+                                            resolve(settingsData);
+                                        });
                                 });
                             });
-                        });
                 }
             });
         }
@@ -401,11 +467,11 @@
 
         }
 
-        function loadSelectSpeedOptions() {
+        function loadSelectNumericOptions(increments, total) {
             var html = '';
             html += '<option value="0">Unlimited</option>';
-            for (var i = 25; i <= 1000; i += 25) {
-                html += '<option value="' + i + '">' + i + 'KB/s</option>';
+            for (var i = increments; i <= total; i += increments) {
+                html += '<option value="' + i + '">' + i + '</option>';
             }
             return html;
         }
@@ -437,19 +503,61 @@
 
                 getSettings(config).then(results => {
                     var settings = results.settings;
+
                     console.log(settings[26]);  //UP
                     console.log(settings[25]); //DL
-                    var upload = view.querySelector('#selectMaxUpload');
-                    upload.innerHTML = loadSelectSpeedOptions();
-                    var download = view.querySelector('#selectMaxDownload');
-                    download.innerHTML = loadSelectSpeedOptions();
 
-                    var settingsDownloadSpeed = settings[25];
-                    var settingsUploadSpeed = settings[26];
+                    var activeDownloads = view.querySelector('#selectNumActiveDownloads');
+                    var activeTorrents  = view.querySelector('#selectNumActiveTorrents');
+                    var upload          = view.querySelector('#selectMaxUpload');
+                    var download        = view.querySelector('#selectMaxDownload');
+                     
+                    upload.innerHTML          = loadSelectNumericOptions(5, 1000);
+                    download.innerHTML        = loadSelectNumericOptions(5, 1000);
+                    activeDownloads.innerHTML = loadSelectNumericOptions(1, 50);
+                    activeTorrents.innerHTML  = loadSelectNumericOptions(1, 50);
+                    
+                    var settingsDownloadSpeed         = settings[25];
+                    var settingsUploadSpeed           = settings[26];
+                    var settingsActiveDownloadCount   = settings[52];
+                    var settingsActiveTorrentsCount   = settings[51];
 
-                    download.value = settingsDownloadSpeed[2];
-                    upload.value = settingsUploadSpeed[2];
+                    download.value        = settingsDownloadSpeed[2];
+                    upload.value          = settingsUploadSpeed[2];
+                    activeDownloads.value = settingsActiveDownloadCount[2];
+                    activeTorrents.value  = settingsActiveTorrentsCount[2];
+
                 });
+
+
+                view.querySelector('#selectMaxUpload').addEventListener('change', 
+                    (e) => {
+                    setSettings("max_ul_rate", e.target.value, config).then((result) => {
+                        console.log("max_ul_rate " + e.target.value); 
+                    });
+                });
+
+                view.querySelector('#selectMaxDownload').addEventListener('change',
+                    (e) => {
+                        setSettings("max_dl_rate", e.target.value, config).then((result) => {
+                            console.log("max_dl_rate " + e.target.value); 
+                        });
+                    });
+
+                view.querySelector('#selectNumActiveDownloads').addEventListener('change', 
+                    (e) => {
+                        setSettings("max_active_downloads", e.target.value, config).then((result) => {
+                            console.log("max_active_downloads " + e.target.value); 
+                        });
+                    });
+
+                view.querySelector('#selectNumActiveTorrents').addEventListener('change',
+                    (e) => {
+                        setSettings("max_active_torrent", e.target.value, config).then((result) => {
+                            console.log("max_active_torrent " + e.target.value); 
+                        });
+                    });
+
 
                 Dashboard.hideLoadingMsg();
             }  
@@ -470,8 +578,8 @@
         return function (view) {
             view.addEventListener('viewshow',
                 () => {
-                    Dashboard.showLoadingMsg(); 
-                    token = null; //rest the token
+                    loading.show(); 
+                    token = null; 
 
                     loadConfig(view);
 
@@ -486,8 +594,8 @@
                         (e) => {
                             e.preventDefault();
                             openAddTorrentDialog();
-                        });  
-
+                        });   
+                   
                 });
 
             view.addEventListener('viewhide', () => {
