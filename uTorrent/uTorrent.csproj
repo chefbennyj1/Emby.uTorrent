@@ -22,6 +22,6 @@
   <EmbeddedResource Include="thumb.jpg" />
 </ItemGroup>
 
-<ItemGroup> <PackageReference Include="mediabrowser.server.core" Version="4.3.0.30" /></ItemGroup>
+<ItemGroup> <PackageReference Include="mediabrowser.server.core" Version="4.3.0.30" /> <PackageReference Include="System.Memory" Version="4.5.4" /></ItemGroup>
 
 </Project>

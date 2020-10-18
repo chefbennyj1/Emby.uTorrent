@@ -6,15 +6,42 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using MediaBrowser.Common.Net;
+using MediaBrowser.Controller.Session;
 using uTorrent.Api;
 using uTorrent.Helpers;
 
 namespace uTorrent
 {
-    
     public class UTorrentService : IService
     {
+       [Route("/RemoveTorrent", "GET", Summary = "Remove Torrent End Point")]
+        public class RemoveTorrent : IReturn<string>
+        {
+            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string Token { get; set; }
+
+            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string IpAddress { get; set; }
+
+            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string Port { get; set; }
+
+            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string UserName { get; set; }
+
+            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string Password { get; set; }
+
+            [ApiMember(Name = "Id", Description = "Hash", IsRequired = true, DataType = "string",
+                ParameterType = "query", Verb = "GET")]
+            public string Id { get; set; }
+        }
+
         [Route("/StopTorrent", "GET", Summary = "Start Torrent End Point")]
         public class StopTorrent : IReturn<string>
         {
@@ -113,8 +140,7 @@ namespace uTorrent
             public string sizeTotalDriveSpace { get; set; }
             public string sizeTotalDriveSpaceBytes { get; set; }
         }
-
-
+        
         [Route("/GetSettingsData", "GET", Summary = "Torrent List End Point")]
         public class Settings : IReturn<string>
         {
@@ -165,24 +191,48 @@ namespace uTorrent
             public string token { get; set; }
         }
 
+        private ISessionManager SessionManager { get; set; }
         private static IJsonSerializer JsonSerializer  { get; set; }
         private string CacheId                         { get; set; }
         private List<Torrent> torrents = new List<Torrent>();
         
-        private string gui   => "/gui/?";
-        private string list  => "&list=1";
-        private string token => "token=";
-        private string cache => "&cid=";
+        private string gui         => "/gui/?";
+        private string list        => "&list=1";
+        private string token       => "token=";
+        private string cache       => "&cid=";
         private string getSettings => "&action=getsettings";
         private string setSettings => "&action=setsetting";
         
-        public UTorrentService(IJsonSerializer json, IHttpClient client)
+        public UTorrentService(IJsonSerializer json, ISessionManager sessionManager)
         {
             JsonSerializer = json;
-            
+            SessionManager = sessionManager;
         }
 
         // ReSharper disable MethodNameNotMeaningful
+        public string Get(RemoveTorrent request)
+        {
+            try
+            {
+                const string endpoint = "&action=removedata&hash=";
+                var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{endpoint}{request.Id}";
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
+                httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+
+                using (var response = (HttpWebResponse)httpWebRequest.GetResponse())
+                {
+                    return JsonSerializer.SerializeToString(new StatusResponse()
+                        { status = response.StatusCode.ToString() });
+                }
+            }
+            catch (Exception ex)
+            {
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                    { status = ex.Message });
+            }
+        }
+
         public string Get(SetSettings request)
         {
             var url = $"http://{request.IpAddress}:{request.Port}{gui}{token}{request.Token}{setSettings}&s={request.SettingName}&v={request.SettingValue}";
@@ -190,16 +240,8 @@ namespace uTorrent
             httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
             using (var response = (HttpWebResponse) httpWebRequest.GetResponse())
             {
-                if (response.StatusCode != HttpStatusCode.OK) return null;
-                using (var receiveStream = response.GetResponseStream())
-                {
-                    if (receiveStream == null) return null;
-                    using (var sr = new StreamReader(receiveStream,
-                        Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
-                    {
-                        return sr.ReadToEnd();
-                    }
-                }
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                    { status = response.StatusCode.ToString() });
             }
         }
 
@@ -374,7 +416,7 @@ namespace uTorrent
             try
             {
                 const string endpoint = "&action=start&hash=";
-                var url = $"http://{request.IpAddress}:{request.Port}{endpoint}{request.Token}";
+                var url = $"http://{request.IpAddress}:{request.Port}{token}{request.Token}{endpoint}";
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
                 httpWebRequest.Credentials = new NetworkCredential(request.UserName, request.Password);
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";

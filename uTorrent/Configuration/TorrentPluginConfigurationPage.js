@@ -129,15 +129,19 @@
                         password                  : dlg.querySelector('#pass').value,
                         ipAddress                 : dlg.querySelector('#ip').value,
                         port                      : dlg.querySelector('#port').value,
-                        FinishedDownloadsLocation : dlg.querySelector('#finishedDownloadLocation').value
-
+                        FinishedDownloadsLocation : dlg.querySelector('#finishedDownloadLocation').value 
                     }
 
-                    ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
+                    ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
 
-                        loadPageData(view, config);
+                        loadPageData(view, config); 
 
-                        Dashboard.processPluginConfigurationUpdateResult(result);
+                        //ApiClient.getJSON(ApiClient.getUrl("uTorrentPluginDataFolderPath")).then(folder => {
+                        //    setSettings("state_cmd", folder.path + "/uTorrentWebSocketMessenger.exe http://192.168.2.126:8096/emby/SendUpdateMessage", config).then(r => {
+                        //        Dashboard.processPluginConfigurationUpdateResult(r);
+                        //    });
+                        //});
+
                     });
 
                     dialogHelper.close(dlg);
@@ -205,6 +209,10 @@
                 html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
                 html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Status == "queued" ? "Queued" : torrent.Eta) + '</td>';
                 html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
+                html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
+                html += '<button id="' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
+                html += '</td>';
+
                 html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
 
                 html += '</tr>';
@@ -248,8 +256,8 @@
                             "&SettingName=" +
                             setting +
                             "&SettingValue=" +
-                            value)).then((settingsData) => {
-                                resolve(settingsData);
+                            value)).then((result) => {
+                                resolve(result);
                             });
                     });
 
@@ -349,7 +357,64 @@
                 }
             });
         }
+        
+        function removeTorrent(hash, config) {
+            return new Promise((resolve, reject) => {
+                if (token == null) {
+                    getToken(config).then(t => {
+                        token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
+                            token +
+                            "&IpAddress=" +
+                            config.ipAddress +
+                            "&Port=" +
+                            config.port +
+                            "&UserName=" +
+                            encodeURIComponent(config.userName) +
+                            "&Password=" +
+                            encodeURIComponent(config.password) +
+                            "&Id=" + hash)).then((result) => {
+                                resolve(result);
+                            });
+                    });
 
+                } else {
+
+                    ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
+                        token +
+                        "&IpAddress=" +
+                        config.ipAddress +
+                        "&Port=" +
+                        config.port +
+                        "&UserName=" +
+                        encodeURIComponent(config.userName) +
+                        "&Password=" +
+                        encodeURIComponent(config.password) +
+                        "&Id=" + hash)).then((result) => {
+                            resolve(result);
+                        },
+                            () => {
+                                getToken(config).then(t => {
+                                    token = t;
+                                    ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
+                                        token +
+                                        "&IpAddress=" +
+                                        config.ipAddress +
+                                        "&Port=" +
+                                        config.port +
+                                        "&UserName=" +
+                                        encodeURIComponent(config.userName) +
+                                        "&Password=" +
+                                        encodeURIComponent(config.password) +
+                                        "&Id=" + hash)).then((result) => {
+                                            resolve(result);
+                                        });
+                                });
+                            });
+                }
+            });
+        }
+        
         function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
                 if (token == null) {
@@ -478,24 +543,51 @@
 
         function updateTorrentResultTable(view, config) {
             if (uTorrentProgressIntervalUpdate) {
-                setTimeout(() => {
-
-                    getUTorrentData(config, "DateAdded").then((results) => {  
-                        view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                        view.querySelector('.torrentInfoContainer > h2').innerText = results.torrents.length +' torrents';
-                        console.log("uTorrent data updated");
-                        updateTorrentResultTable(view, config);
+                //    setTimeout(() => {
+                var sortBySelect = view.querySelector('#selectSortListBy');
+                var sort = sortBySelect.value;
+                getUTorrentData(config, sort).then((results) => {
+                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+                    view.querySelector('.torrentInfoContainer > h2').innerText = results.torrents.length + ' torrents';
+                    view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
+                        removeTorrentButton.addEventListener('click',
+                            (e) => {
+                                var tableRow = e.target.closest('tr');
+                                tableRow.querySelector('.taskProgressInner').style = "background-color:yellow";
+                                tableRow.disabled = true;
+                                removeTorrent(e.target.closest('button').id, config).then(result => {
+                                    console.log(result.status);
+                                });
+                            });
                     });
-
-                }, 2000);
+                    console.log("uTorrent data updated");
+                    Dashboard.hideLoadingMsg();
+                    updateTorrentResultTable(view, config);
+                });
+                
+                //    }, 1000);
             }
         }
         
         function loadPageData(view, config) {
             if (config.userName) {
-                
-                getUTorrentData(config, "DateAdded").then((results) => { 
+                var sortBySelect = view.querySelector('#selectSortListBy');
+                var sort = sortBySelect.value;
+                getUTorrentData(config, sort).then((results) => { 
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+                    
+                    view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
+                        removeTorrentButton.addEventListener('click',
+                            (e) => {
+                                var tableRow = e.target.closest('tr');
+                                tableRow.querySelector('.taskProgressInner').style = "background-color:yellow";
+                                tableRow.disabled = true;
+                                removeTorrent(e.target.closest('button').id, config).then(result => {
+                                    console.log(result.status);
+                                });
+                            });
+                    });
+
                 });
 
                 uTorrentProgressIntervalUpdate = true;
@@ -521,6 +613,9 @@
                     var settingsUploadSpeed           = settings[26];
                     var settingsActiveDownloadCount   = settings[52];
                     var settingsActiveTorrentsCount   = settings[51];
+                    var stateCommand = settings[72];
+
+                    console.log(stateCommand[2]);
 
                     download.value        = settingsDownloadSpeed[2];
                     upload.value          = settingsUploadSpeed[2];
@@ -533,21 +628,24 @@
                 view.querySelector('#selectMaxUpload').addEventListener('change', 
                     (e) => {
                     setSettings("max_ul_rate", e.target.value, config).then((result) => {
-                        console.log("max_ul_rate " + e.target.value); 
+                        console.log("max_ul_rate " + e.target.value);
+                        console.log(result.status);
                     });
                 });
 
                 view.querySelector('#selectMaxDownload').addEventListener('change',
                     (e) => {
                         setSettings("max_dl_rate", e.target.value, config).then((result) => {
-                            console.log("max_dl_rate " + e.target.value); 
+                            console.log("max_dl_rate " + e.target.value);
+                            console.log(result.status);
                         });
                     });
 
                 view.querySelector('#selectNumActiveDownloads').addEventListener('change', 
                     (e) => {
                         setSettings("max_active_downloads", e.target.value, config).then((result) => {
-                            console.log("max_active_downloads " + e.target.value); 
+                            console.log("max_active_downloads " + e.target.value);
+                            console.log(result.status);
                         });
                     });
 
@@ -555,11 +653,20 @@
                     (e) => {
                         setSettings("max_active_torrent", e.target.value, config).then((result) => {
                             console.log("max_active_torrent " + e.target.value); 
+                            console.log(result.status);
                         });
                     });
 
+                //ApiClient._webSocket.addEventListener('message',
+                //    function(message) {
+                //        var json = JSON.parse(message.data);
+                //        if (json.MessageType === "UpdateList") {
+                //            updateTorrentResultTable(view, config);
+                //        }
+                //    });
 
-                Dashboard.hideLoadingMsg();
+
+                    Dashboard.hideLoadingMsg();
             }  
         }
 
@@ -573,12 +680,11 @@
                     loadPageData(view, config);
                 });
         }
-
-       
+         
         return function (view) {
             view.addEventListener('viewshow',
                 () => {
-                    loading.show(); 
+                    Dashboard.showLoadingMsg(); 
                     token = null; 
 
                     loadConfig(view);
@@ -596,6 +702,9 @@
                             openAddTorrentDialog();
                         });   
                    
+                    view.querySelector('#selectSortListBy').addEventListener('change', () => {
+                        Dashboard.showLoadingMsg();
+                    });
                 });
 
             view.addEventListener('viewhide', () => {
