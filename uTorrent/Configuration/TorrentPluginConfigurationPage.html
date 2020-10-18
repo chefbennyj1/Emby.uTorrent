@@ -7,8 +7,8 @@
                 </svg>
                 <h2 class="sectionTitle sectionTitle-cards" style="padding-bottom:2em">µTorrent</h2>
                 <hr />
-                <div style="display: block">
-                    <div style="margin-top: 2em; margin-bottom: 2em; flex-grow: 1; padding-right: 3em; display:flex">
+                <form style="display: block">
+                    <div style="margin-top: 2em; margin-bottom: 2em; flex-grow: 1; padding-right: 3em;">
                         <div class="detailSectionHeader" style="margin:2em">
                             <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Settings</h2>
                             <button is="emby-button" id="openTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">settings</i></button>
@@ -17,12 +17,22 @@
                             <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
                             <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
                         </div>
-                        <div class="torrentInfoContainer" style="padding-top: 1.25em;padding-right: 47%;">
+                        <div class="torrentInfoContainer" style="padding-left: 2em;">
                             <h2><span style="color: orangered; font-weight: bolder">Loading torrent data...</span></h2>
                         </div>
-
+                        <div class="selectContainer fldSortList" style="padding-bottom:2em">
+                            <label class="selectLabel" for="selectSortListBy">Sort list by:</label>
+                            <select is="emby-select" id="selectSortListBy" label="Max upload speed (kB/s):" class="emby-select-withcolor emby-select">
+                                <option value="DateAdded" selected>Date Added</option>
+                                <option value="Name">Name</option>
+                                <option value="FileSize">File Size</option>
+                            </select>
+                            <div class="selectArrowContainer">
+                                <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
                 <hr />
                 <div class="scrollY" style="max-height: 35em; margin:4em 2em 2em 2em">
                     <table class="tblTorrentResults table detailTable" style="width: 100%;">
@@ -42,19 +52,8 @@
                         </thead>
                         <tbody class="torrentResultBody"></tbody>
                     </table>
-                </div>
-                
-                <div class="selectContainer fldSortList" style="padding-bottom:2em">
-                    <label class="selectLabel" for="selectSortListBy">Sort list by:</label>
-                    <select is="emby-select" id="selectSortListBy" label="Max upload speed (kB/s):" class="emby-select-withcolor emby-select">
-                        <option value="DateAdded" selected>Date Added</option>
-                        <option value="Name">Name</option>
-                        <option value="FileSize">File Size</option>
-                    </select>
-                    <div class="selectArrowContainer">
-                        <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
-                    </div>
-                </div>
+                </div>              
+               
 
                 <hr />
                 <form style="padding: 2em;">
