@@ -5,6 +5,8 @@
         
         var token = null;
 
+       
+
         var uTorrentProgressIntervalUpdate; //Only request torrent data when the page is shown on the screen
 
         function openAddTorrentDialog() {
@@ -224,14 +226,7 @@
         function getToken(config) {
             return new Promise((resolve, reject) => {
                 if (config.userName) {
-                    ApiClient.getJSON(ApiClient.getUrl("GetToken?UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port)).then((result) => {
+                    ApiClient.getJSON(ApiClient.getUrl("GetToken")).then((result) => {
                             resolve(result.token);
                         });
                 }
@@ -245,14 +240,6 @@
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
                             token +
-                            "&IpAddress=" +
-                            config.ipAddress +
-                            "&Port=" +
-                            config.port +
-                            "&UserName=" +
-                            encodeURIComponent(config.userName) +
-                            "&Password=" +
-                            encodeURIComponent(config.password) +
                             "&SettingName=" +
                             setting +
                             "&SettingValue=" +
@@ -264,15 +251,7 @@
                 } else {
 
                     ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
-                        token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
+                        token + 
                         "&SettingName=" +
                         setting +
                         "&SettingValue=" +
@@ -283,15 +262,7 @@
                             getToken(config).then(t => {
                                 token = t;
                                 ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
-                                    encodeURIComponent(token) +
-                                    "&IpAddress=" +
-                                    config.ipAddress +
-                                    "&Port=" +
-                                    config.port +
-                                    "&UserName=" +
-                                    encodeURIComponent(config.userName) +
-                                    "&Password=" +
-                                    encodeURIComponent(config.password) +
+                                    encodeURIComponent(token) + 
                                     "&SettingName=" +
                                     setting +
                                     "&SettingValue=" +
@@ -310,15 +281,7 @@
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                            token +
-                            "&IpAddress=" +
-                            config.ipAddress +
-                            "&Port=" +
-                            config.port +
-                            "&UserName=" +
-                            encodeURIComponent(config.userName) +
-                            "&Password=" +
-                            encodeURIComponent(config.password))).then((settingsData) => {
+                            token)).then((settingsData) => {
                                 resolve(settingsData);
                             });
                     });
@@ -326,30 +289,14 @@
                 } else {
 
                     ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                        token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password))).then((settingsData) => {
+                        token)).then((settingsData) => {
                             resolve(settingsData);
                         },
                             () => {
                                 getToken(config).then(t => {
                                     token = t;
                                     ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                                        encodeURIComponent(token) +
-                                        "&IpAddress=" +
-                                        config.ipAddress +
-                                        "&Port=" +
-                                        config.port +
-                                        "&UserName=" +
-                                        encodeURIComponent(config.userName) +
-                                        "&Password=" +
-                                        encodeURIComponent(config.password))).then((settingsData) => {
+                                        encodeURIComponent(token))).then((settingsData) => {
                                             resolve(settingsData);
                                         });
                                 });
@@ -364,15 +311,7 @@
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                            token +
-                            "&IpAddress=" +
-                            config.ipAddress +
-                            "&Port=" +
-                            config.port +
-                            "&UserName=" +
-                            encodeURIComponent(config.userName) +
-                            "&Password=" +
-                            encodeURIComponent(config.password) +
+                            token + 
                             "&Id=" + hash)).then((result) => {
                                 resolve(result);
                             });
@@ -381,15 +320,7 @@
                 } else {
 
                     ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                        token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
+                        token + 
                         "&Id=" + hash)).then((result) => {
                             resolve(result);
                         },
@@ -397,15 +328,7 @@
                                 getToken(config).then(t => {
                                     token = t;
                                     ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                                        token +
-                                        "&IpAddress=" +
-                                        config.ipAddress +
-                                        "&Port=" +
-                                        config.port +
-                                        "&UserName=" +
-                                        encodeURIComponent(config.userName) +
-                                        "&Password=" +
-                                        encodeURIComponent(config.password) +
+                                        token + 
                                         "&Id=" + hash)).then((result) => {
                                             resolve(result);
                                         });
@@ -421,15 +344,7 @@
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                            token +
-                            "&IpAddress=" +
-                            config.ipAddress +
-                            "&Port=" +
-                            config.port +
-                            "&UserName=" +
-                            encodeURIComponent(config.userName) +
-                            "&Password=" +
-                            encodeURIComponent(config.password) +
+                            token + 
                             "&SortBy=" +
                             sortBy)).then((torrentData) => {
                             resolve(torrentData);
@@ -440,14 +355,6 @@
 
                     ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
                         token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
                         "&SortBy=" +
                         sortBy)).then((torrentData) => { 
                             resolve(torrentData);
@@ -456,15 +363,7 @@
                             getToken(config).then(t => {
                                 token = t;
                                 ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                                    encodeURIComponent(token) +
-                                    "&IpAddress=" +
-                                    config.ipAddress +
-                                    "&Port=" +
-                                    config.port +
-                                    "&UserName=" +
-                                    encodeURIComponent(config.userName) +
-                                    "&Password=" +
-                                    encodeURIComponent(config.password) +
+                                    token +
                                     "&SortBy=" +
                                     sortBy)).then((torrentData) => {
                                     resolve(torrentData);
@@ -503,14 +402,6 @@
                 getToken(config).then((token) => {
                     ApiClient.getJSON(ApiClient.getUrl("AddTorrentUrl?Token=" +
                         token +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
                         "&Url=" +
                         encodeURIComponent(url))).then((result) => {
                             resolve(result.status);
@@ -548,7 +439,7 @@
                 var sort = sortBySelect.value;
                 getUTorrentData(config, sort).then((results) => {
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                    view.querySelector('.torrentInfoContainer > h2').innerText = results.torrents.length + ' torrents';
+                    view.querySelector('.torrentInfoContainer > h2').innerText = results.TotalRecordCount + ' torrents';
                     view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
                         removeTorrentButton.addEventListener('click',
                             (e) => {
@@ -571,25 +462,7 @@
         
         function loadPageData(view, config) {
             if (config.userName) {
-                var sortBySelect = view.querySelector('#selectSortListBy');
-                var sort = sortBySelect.value;
-                getUTorrentData(config, sort).then((results) => { 
-                    view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
-                    
-                    view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
-                        removeTorrentButton.addEventListener('click',
-                            (e) => {
-                                var tableRow = e.target.closest('tr');
-                                tableRow.querySelector('.taskProgressInner').style = "background-color:yellow";
-                                tableRow.disabled = true;
-                                removeTorrent(e.target.closest('button').id, config).then(result => {
-                                    console.log(result.status);
-                                });
-                            });
-                    });
-
-                });
-
+                
                 uTorrentProgressIntervalUpdate = true;
                 updateTorrentResultTable(view, config);
 

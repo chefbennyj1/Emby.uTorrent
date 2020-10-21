@@ -17,9 +17,7 @@
                             <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Add torrent from url</h2>
                             <button is="emby-button" id="openAddTorrentDialog" class="fab emby-input-iconbutton paper-icon-button-light emby-button" style="margin-left: 1em;"><i class="md-icon">add</i></button>
                         </div>
-                        <div class="torrentInfoContainer" style="padding-left: 2em;">
-                            <h2><span style="color: orangered; font-weight: bolder">Loading torrent data...</span></h2>
-                        </div>
+                        
                         <div class="selectContainer fldSortList" style="padding-bottom:2em">
                             <label class="selectLabel" for="selectSortListBy">Sort list by:</label>
                             <select is="emby-select" id="selectSortListBy" label="Max upload speed (kB/s):" class="emby-select-withcolor emby-select">
@@ -34,7 +32,14 @@
                     </div>
                 </form>
                 <hr />
-                <div class="scrollY" style="max-height: 35em; margin:4em 2em 2em 2em">
+                <div class="pages" style="display: inline-flex">
+                    <!----button id="forward" class="fab emby-input-iconbutton paper-icon-button-light emby-button"><i class="md-icon">arrow_forward</i></button-->
+                    <!---button id="back" class="fab emby-input-iconbutton paper-icon-button-light emby-button"><i class="md-icon">arrow_back</i></!--button-->
+                    <div class="torrentInfoContainer" style="padding-left: 2em;">
+                        <h2><span style="font-weight: bolder">Loading torrent data...</span></h2>
+                    </div>
+                </div>
+                <div class="scrollY" style="max-height: 35em; margin:0 2em 2em 2em">
                     <table class="tblTorrentResults table detailTable" style="width: 100%;">
                         <thead>
                         <tr style="text-align: left;">
