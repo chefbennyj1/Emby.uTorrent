@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.System;
 using uTorrent.Api;
 using uTorrent.Helpers;
 
@@ -114,7 +116,7 @@ namespace uTorrent
         }
 
         private static IJsonSerializer JsonSerializer  { get; set; }
-        
+        private ILogger Log { get; set; }
         private string CacheId                         { get; set; }
 
         private List<Torrent> Torrents = new List<Torrent>();
@@ -127,9 +129,10 @@ namespace uTorrent
         private string setSettings => "&action=setsetting";
         
 
-        public UTorrentService(IJsonSerializer json)
+        public UTorrentService(IJsonSerializer json, ILogManager logMan)
         {
             JsonSerializer = json;
+            Log = logMan.GetLogger(Plugin.Instance.Name);
         }
 
         // ReSharper disable MethodNameNotMeaningful
@@ -186,15 +189,15 @@ namespace uTorrent
             }
             var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{getSettings}";
             var client = new TorrentClient();
-            var response = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
-            if (response.StatusCode != HttpStatusCode.OK) return null;
+            var response = client.GetHttpWebResponse(url, "application/json");
+            if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
             using (var receiveStream = response.GetResponseStream())
             {
-                if (receiveStream == null) return null;
-                using (var sr = new StreamReader(receiveStream,
-                    Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
+                if (receiveStream == null) return string.Empty;
+                using (var sr = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
                 {
-                    return sr.ReadToEnd();
+                    var data = sr.ReadToEnd();
+                    return data;
                 }
             }
         }
@@ -212,7 +215,7 @@ namespace uTorrent
             url += CacheId == null ? string.Empty : $"{cache}{CacheId}";
 
             var client = new TorrentClient();
-            var response = client.GetHttpWebResponse(url,  "application/x-www-form-urlencoded");
+            var response = client.GetHttpWebResponse(url,  "application/json");
 
             if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
 
@@ -283,8 +286,8 @@ namespace uTorrent
             {
                 return JsonSerializer.SerializeToString(new StatusResponse() { status = "No configuration present" }); 
             }
-            var url = $"http://{config.ipAddress}:{config.port}{endpoint}";
-            var client = new TorrentClient();
+            var url      = $"http://{config.ipAddress}:{config.port}{endpoint}";
+            var client   = new TorrentClient();
             var response = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
             if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
             using (var receiveStream = response.GetResponseStream())
@@ -314,9 +317,9 @@ namespace uTorrent
             try
             {
                 const string endpoint = "&action=add-url&s=";
-                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}{request.Url}";
-                var client = new TorrentClient();
-                var response = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
+                var url               = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}{request.Url}";
+                var client            = new TorrentClient();
+                var response          = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
 
                 return JsonSerializer.SerializeToString(new StatusResponse()
                 { status = response.StatusCode.ToString() });
@@ -340,9 +343,8 @@ namespace uTorrent
                     return JsonSerializer.SerializeToString(new StatusResponse()
                         { status = "No configuration present" }); 
                 }
-                var url = $"http://{config.ipAddress}:{config.port}{endpoint}{request.Token}";
-
-                var client = new TorrentClient();
+                var url      = $"http://{config.ipAddress}:{config.port}{endpoint}{request.Token}";
+                var client   = new TorrentClient();
                 var response = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
                 return JsonSerializer.SerializeToString(new StatusResponse()
                 { status = response.StatusCode.ToString() });
@@ -366,8 +368,8 @@ namespace uTorrent
                     return JsonSerializer.SerializeToString(new StatusResponse()
                         { status = "No configuration present" }); 
                 }
-                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}";
-                var client = new TorrentClient();
+                var url      = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}";
+                var client   = new TorrentClient();
                 var response = client.GetHttpWebResponse(url, "application/x-www-form-urlencoded");
                 return JsonSerializer.SerializeToString(new StatusResponse()
                 { status = response.StatusCode.ToString() });
@@ -378,7 +380,11 @@ namespace uTorrent
                     { status = ex.Message });
             }
         }
-        
+
+        private class SettingsResponse
+        {
+            public string response { get; set; }
+        }
         private class StatusResponse
         {
             public string status { get; set; }

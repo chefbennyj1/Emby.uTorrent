@@ -3,9 +3,7 @@
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
         
-        var token = null;
-
-       
+        var token = null;  
 
         var uTorrentProgressIntervalUpdate; //Only request torrent data when the page is shown on the screen
 
@@ -281,7 +279,7 @@
                     getToken(config).then(t => {
                         token = t;
                         ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                            token)).then((settingsData) => {
+                           token)).then((settingsData) => {
                                 resolve(settingsData);
                             });
                     });
@@ -463,9 +461,6 @@
         function loadPageData(view, config) {
             if (config.userName) {
                 
-                uTorrentProgressIntervalUpdate = true;
-                updateTorrentResultTable(view, config);
-
                 getSettings(config).then(results => {
                     var settings = results.settings;
 
@@ -486,7 +481,7 @@
                     var settingsUploadSpeed           = settings[26];
                     var settingsActiveDownloadCount   = settings[52];
                     var settingsActiveTorrentsCount   = settings[51];
-                    var stateCommand = settings[72];
+                    var stateCommand                  = settings[72];
 
                     console.log(stateCommand[2]);
 
@@ -494,8 +489,12 @@
                     upload.value          = settingsUploadSpeed[2];
                     activeDownloads.value = settingsActiveDownloadCount[2];
                     activeTorrents.value  = settingsActiveTorrentsCount[2];
+                    uTorrentProgressIntervalUpdate = true;
+                    updateTorrentResultTable(view, config); 
 
                 });
+
+
 
 
                 view.querySelector('#selectMaxUpload').addEventListener('change', 

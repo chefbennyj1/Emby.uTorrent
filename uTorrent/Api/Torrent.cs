@@ -1,4 +1,5 @@
-﻿namespace uTorrent.Api {
+﻿namespace uTorrent.Api 
+{
     public class Torrent
     {
         public string Hash                  { get; set; }
