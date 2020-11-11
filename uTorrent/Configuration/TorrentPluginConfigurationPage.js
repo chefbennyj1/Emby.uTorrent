@@ -3,8 +3,11 @@
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
         
-        var token = null;  
+        var token = null;
 
+        var torrentListIndex = 0;
+        var totalRecordCount = 0;
+        var torrentp = [];
         var uTorrentProgressIntervalUpdate; //Only request torrent data when the page is shown on the screen
 
         function openAddTorrentDialog() {
@@ -207,7 +210,7 @@
                 html += '</div>';
                 html += '</td>';
                 html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
-                html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Status == "queued" ? "Queued" : torrent.Eta) + '</td>';
+                html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
                 html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
                 html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
                 html += '<button id="' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
@@ -345,11 +348,12 @@
                             token + 
                             "&SortBy=" +
                             sortBy)).then((torrentData) => {
+                                
                             resolve(torrentData);
                         });
                     });
 
-                } else {
+                } else {  
 
                     ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
                         token +
@@ -438,6 +442,7 @@
                 getUTorrentData(config, sort).then((results) => {
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                     view.querySelector('.torrentInfoContainer > h2').innerText = results.TotalRecordCount + ' torrents';
+                    totalRecordCount = results.TotalRecordCount;
                     view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
                         removeTorrentButton.addEventListener('click',
                             (e) => {
@@ -452,6 +457,7 @@
                     console.log("uTorrent data updated");
                     Dashboard.hideLoadingMsg();
                     updateTorrentResultTable(view, config);
+                   
                 });
                 
                 //    }, 1000);
@@ -494,9 +500,25 @@
 
                 });
 
+                /*
+                view.querySelector('#forward').addEventListener('click', (e) => {
+                    Dashboard.showLoadingMsg();
+                    if (torrentListIndex + 20 > totalRecordCount) {
+                        torrentListIndex = totalRecordCount - torrentListIndex;
+                        return;
+                    }
+                    torrentListIndex += 20;
+                });
 
-
-
+                view.querySelector('#back').addEventListener('click', (e) => {
+                    Dashboard.showLoadingMsg();
+                    if (torrentListIndex - 20 < 0) {
+                        torrentListIndex = 0;
+                        return;
+                    }
+                    torrentListIndex -= 20;
+                });
+                 */
                 view.querySelector('#selectMaxUpload').addEventListener('change', 
                     (e) => {
                     setSettings("max_ul_rate", e.target.value, config).then((result) => {

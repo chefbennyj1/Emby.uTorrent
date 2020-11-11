@@ -60,6 +60,7 @@ namespace uTorrent
             [ApiMember(Name = "Url", Description = "Url", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Url { get; set; }
         }
+
         
         [Route("/GetTorrentData", "GET", Summary = "Torrent List End Point")]
         public class TorrentData : IReturn<string>
@@ -68,9 +69,7 @@ namespace uTorrent
             public string Token { get; set; }
             [ApiMember(Name = "SortBy", Description = "SortBy", IsRequired = false, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string SortBy { get; set; }
-            [ApiMember(Name = "StartIndex", Description = "Start Index", IsRequired = false, DataType = "int", ParameterType = "query", Verb = "GET")]
-            public int? StartIndex { get; set; }
-
+           
             public List<Torrent> torrents          { get; set; }
             public string sizeDownload             { get; set; }
             public string sizeSuffixDownload       { get; set; }
@@ -94,15 +93,6 @@ namespace uTorrent
         {
             [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Token { get; set; }
-            [ApiMember(Name = "IpAddress", Description = "IpAddress", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string IpAddress { get; set; }
-            [ApiMember(Name = "Port", Description = "Port", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Port { get; set; }
-            [ApiMember(Name = "UserName", Description = "UserName", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string UserName { get; set; }
-            [ApiMember(Name = "Password", Description = "Password", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Password { get; set; }
-
             [ApiMember(Name = "SettingName", Description = "Setting Name", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string SettingName { get; set; }
             [ApiMember(Name = "SettingValue", Description = "Setting Value", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
@@ -163,7 +153,7 @@ namespace uTorrent
             }
         }
 
-        public string  Get(SetSettings request)
+        public string Get(SetSettings request)
         {
             var config = Plugin.Instance.Configuration;
             if (config.userName is null)
@@ -179,7 +169,7 @@ namespace uTorrent
 
         }
 
-        public string  Get(Settings request)
+        public string Get(Settings request)
         {
             var config = Plugin.Instance.Configuration;
             if (config.userName is null)
