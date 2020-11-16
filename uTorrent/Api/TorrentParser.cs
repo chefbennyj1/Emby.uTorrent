@@ -8,7 +8,7 @@ namespace uTorrent.Api
 {
     public class TorrentParser
     {
-        public static List<Torrent> ParseTorrentListInfo(List<object[]> obj, string sortBy = null)
+        public static List<Torrent> ParseTorrentListInfo(List<object[]> obj)
         {
             var config = Plugin.Instance.Configuration;
             var dir    = config.FinishedDownloadsLocation ?? string.Empty;
@@ -40,12 +40,7 @@ namespace uTorrent.Api
                 AddedDate             = getAddedDate(dir, (string)t[2])
             });
 
-            switch (sortBy)
-            {
-                case "DateAdded" : return list.OrderBy(t => DateTime.Parse(t.AddedDate)).Reverse().ToList();
-                case "Name"      : return list.ToList();
-                case "FileSize"  : return list.OrderBy(t => Convert.ToInt64(t.TotalBytes)).Reverse().ToList();
-            }
+            
             return list.ToList();
         }
         

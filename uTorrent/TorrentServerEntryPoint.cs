@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Controller.Security;
 using MediaBrowser.Model.Logging;
@@ -9,12 +10,13 @@ namespace uTorrent
     public class UTorrentServerEntryPoint : IServerEntryPoint
     {
         private IJsonSerializer JsonSerializer { get; }
-        private ILogger Log { get; set; }
-
+        public ILogger Log { get; set; }
+        public static UTorrentServerEntryPoint Instance { get; set; }
         public UTorrentServerEntryPoint(IAuthenticationRepository auth, ILogManager logMan, IJsonSerializer json)
         {
             Log = logMan.GetLogger(Plugin.Instance.Name);
             JsonSerializer = json;
+            Instance = this;
         }
 
         
@@ -25,7 +27,7 @@ namespace uTorrent
 
         public void Run()
         {
-
+            
         }
     }
 }

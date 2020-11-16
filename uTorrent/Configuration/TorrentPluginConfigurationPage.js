@@ -341,39 +341,36 @@
         
         function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
-                if (token == null) {
-                    getToken(config).then(t => {
-                        token = t;
-                        ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                            token + 
-                            "&SortBy=" +
+                //if (token == null) {
+                    //getToken(config).then(t => {
+                    //    token = t;
+                        ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?SortBy=" +
                             sortBy)).then((torrentData) => {
-                                
                             resolve(torrentData);
                         });
                     });
 
-                } else {  
+                //} else {  
 
-                    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                        token +
-                        "&SortBy=" +
-                        sortBy)).then((torrentData) => { 
-                            resolve(torrentData);
-                        },
-                        () => {
-                            getToken(config).then(t => {
-                                token = t;
-                                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                                    token +
-                                    "&SortBy=" +
-                                    sortBy)).then((torrentData) => {
-                                    resolve(torrentData);
-                                });
-                            });
-                        });
-                }
-            });
+                //    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                //        token +
+                //        "&SortBy=" +
+                //        sortBy)).then((torrentData) => { 
+                //            resolve(torrentData);
+                //        },
+                //        () => {
+                //            getToken(config).then(t => {
+                //                token = t;
+                //                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
+                //                    token +
+                //                    "&SortBy=" +
+                //                    sortBy)).then((torrentData) => {
+                //                    resolve(torrentData);
+                //                });
+                //            });
+                //        });
+                //}
+            //});
         }
            
         function remoteControlTorrent(remoteCommand, id, config) {
@@ -439,7 +436,7 @@
                 //    setTimeout(() => {
                 var sortBySelect = view.querySelector('#selectSortListBy');
                 var sort = sortBySelect.value;
-                getUTorrentData(config, sort).then((results) => {
+               getUTorrentData(config, sort).then((results) => {
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                     view.querySelector('.torrentInfoContainer > h2').innerText = results.TotalRecordCount + ' torrents';
                     totalRecordCount = results.TotalRecordCount;
@@ -554,8 +551,8 @@
                 //ApiClient._webSocket.addEventListener('message',
                 //    function(message) {
                 //        var json = JSON.parse(message.data);
-                //        if (json.MessageType === "UpdateList") {
-                //            updateTorrentResultTable(view, config);
+                //        if (json.MessageType === "TorrentUpdate") {
+                //            updateTorrentResultTable(view, config, json);
                 //        }
                 //    });
 
@@ -599,6 +596,16 @@
                     view.querySelector('#selectSortListBy').addEventListener('change', () => {
                         Dashboard.showLoadingMsg();
                     });
+
+
+                    ApiClient._webSocket.addEventListener('message', function (message) {
+                        var json = JSON.parse(message.data);
+                        if (json.MessageType === "TorrentListUpdate") {
+                            updateTorrentResultTable(view, config,  json.Data);
+                        }
+                    });
+
+
                 });
 
             view.addEventListener('viewhide', () => {
