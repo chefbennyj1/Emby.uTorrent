@@ -2,12 +2,8 @@
     function (loading, dialogHelper) {
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
-        
-        var token = null;
-
-        var torrentListIndex = 0;
-        var totalRecordCount = 0;
-        var torrentp = [];
+       
+ 
         var uTorrentProgressIntervalUpdate; //Only request torrent data when the page is shown on the screen
 
         function openAddTorrentDialog() {
@@ -224,187 +220,69 @@
             return html;
         }
 
-        function getToken(config) {
+        
+
+        function setSettings(setting, value) {
             return new Promise((resolve, reject) => {
-                if (config.userName) {
-                    ApiClient.getJSON(ApiClient.getUrl("GetToken")).then((result) => {
-                            resolve(result.token);
-                        });
-                }
+                ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?SettingName=" +
+                    setting +
+                    "&SettingValue=" +
+                    value)).then((result) => {
+                    resolve(result);
+                });
             });
         }
 
-        function setSettings(setting, value, config) {
+        function getSettings() {
             return new Promise((resolve, reject) => {
-                if (token == null) {
-                    getToken(config).then(t => {
-                        token = t;
-                        ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
-                            token +
-                            "&SettingName=" +
-                            setting +
-                            "&SettingValue=" +
-                            value)).then((result) => {
-                                resolve(result);
-                            });
-                    });
-
-                } else {
-
-                    ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
-                        token + 
-                        "&SettingName=" +
-                        setting +
-                        "&SettingValue=" +
-                        value)).then((settingsData) => {
-                            resolve(settingsData);
-                        },
-                        () => {
-                            getToken(config).then(t => {
-                                token = t;
-                                ApiClient.getJSON(ApiClient.getUrl("SetSettingsData?Token=" +
-                                    encodeURIComponent(token) + 
-                                    "&SettingName=" +
-                                    setting +
-                                    "&SettingValue=" +
-                                    value)).then((settingsData) => {
-                                        resolve(settingsData);
-                                    });
-                            });
-                        });
-                }
-            });
-        }
-
-        function getSettings(config) {
-            return new Promise((resolve, reject) => {
-                if (token == null) {
-                    getToken(config).then(t => {
-                        token = t;
-                        ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                           token)).then((settingsData) => {
-                                resolve(settingsData);
-                            });
-                    });
-
-                } else {
-
-                    ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                        token)).then((settingsData) => {
-                            resolve(settingsData);
-                        },
-                            () => {
-                                getToken(config).then(t => {
-                                    token = t;
-                                    ApiClient.getJSON(ApiClient.getUrl("GetSettingsData?Token=" +
-                                        encodeURIComponent(token))).then((settingsData) => {
-                                            resolve(settingsData);
-                                        });
-                                });
-                            });
-                }
+                ApiClient.getJSON(ApiClient.getUrl("GetSettingsData")).then((settingsData) => {
+                    resolve(settingsData);
+                });
             });
         }
         
         function removeTorrent(hash, config) {
             return new Promise((resolve, reject) => {
-                if (token == null) {
-                    getToken(config).then(t => {
-                        token = t;
-                        ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                            token + 
-                            "&Id=" + hash)).then((result) => {
-                                resolve(result);
-                            });
-                    });
-
-                } else {
-
-                    ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                        token + 
-                        "&Id=" + hash)).then((result) => {
-                            resolve(result);
-                        },
-                            () => {
-                                getToken(config).then(t => {
-                                    token = t;
-                                    ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Token=" +
-                                        token + 
-                                        "&Id=" + hash)).then((result) => {
-                                            resolve(result);
-                                        });
-                                });
-                            });
-                }
+                ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash)).then((result) => {
+                    resolve(result);
+                });
             });
         }
         
         function getUTorrentData(config, sortBy) {
             return new Promise((resolve, reject) => {
-                //if (token == null) {
-                    //getToken(config).then(t => {
-                    //    token = t;
+                
                         ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?SortBy=" +
                             sortBy)).then((torrentData) => {
                             resolve(torrentData);
                         });
                     });
-
-                //} else {  
-
-                //    ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                //        token +
-                //        "&SortBy=" +
-                //        sortBy)).then((torrentData) => { 
-                //            resolve(torrentData);
-                //        },
-                //        () => {
-                //            getToken(config).then(t => {
-                //                token = t;
-                //                ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?Token=" +
-                //                    token +
-                //                    "&SortBy=" +
-                //                    sortBy)).then((torrentData) => {
-                //                    resolve(torrentData);
-                //                });
-                //            });
-                //        });
-                //}
-            //});
         }
            
         function remoteControlTorrent(remoteCommand, id, config) {
             return new Promise((resolve, reject) => {
-                getToken(config).then((token) => {
-                    ApiClient.getJSON(ApiClient.getUrl(
-                        remoteCommand +
-                        "?Token=" +
-                        encodeURIComponent(token) +
-                        "&IpAddress=" +
-                        config.ipAddress +
-                        "&Port=" +
-                        config.port +
-                        "&UserName=" +
-                        encodeURIComponent(config.userName) +
-                        "&Password=" +
-                        encodeURIComponent(config.password) +
-                        "&Id=" +
-                        id)).then((response) => {
-                            resolve(response.status);
-                        });
+                ApiClient.getJSON(ApiClient.getUrl(
+                    remoteCommand +
+                    "?IpAddress=" +
+                    config.ipAddress +
+                    "&Port=" +
+                    config.port +
+                    "&UserName=" +
+                    encodeURIComponent(config.userName) +
+                    "&Password=" +
+                    encodeURIComponent(config.password) +
+                    "&Id=" +
+                    id)).then((response) => {
+                    resolve(response.status);
                 });
             });
         }
 
         function addTorrentUrl(url, config) {
             return new Promise((resolve, reject) => {
-                getToken(config).then((token) => {
-                    ApiClient.getJSON(ApiClient.getUrl("AddTorrentUrl?Token=" +
-                        token +
-                        "&Url=" +
-                        encodeURIComponent(url))).then((result) => {
-                            resolve(result.status);
-                        });
+                ApiClient.getJSON(ApiClient.getUrl("AddTorrentUrl?&Url=" +
+                    encodeURIComponent(url))).then((result) => {
+                    resolve(result.status);
                 });
             });
         }
@@ -440,6 +318,7 @@
                     view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
                     view.querySelector('.torrentInfoContainer > h2').innerText = results.TotalRecordCount + ' torrents';
                     totalRecordCount = results.TotalRecordCount;
+                    Dashboard.hideLoadingMsg();
                     view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
                         removeTorrentButton.addEventListener('click',
                             (e) => {
@@ -452,9 +331,7 @@
                             });
                     });
                     console.log("uTorrent data updated");
-                    Dashboard.hideLoadingMsg();
                     updateTorrentResultTable(view, config);
-                   
                 });
                 
                 //    }, 1000);
@@ -462,9 +339,10 @@
         }
         
         function loadPageData(view, config) {
+            Dashboard.showLoadingMsg(); 
             if (config.userName) {
                 
-                getSettings(config).then(results => {
+                getSettings().then(results => {
                     var settings = results.settings;
 
                     console.log(settings[26]);  //UP
@@ -518,7 +396,7 @@
                  */
                 view.querySelector('#selectMaxUpload').addEventListener('change', 
                     (e) => {
-                    setSettings("max_ul_rate", e.target.value, config).then((result) => {
+                    setSettings("max_ul_rate", e.target.value).then((result) => {
                         console.log("max_ul_rate " + e.target.value);
                         console.log(result.status);
                     });
@@ -526,7 +404,7 @@
 
                 view.querySelector('#selectMaxDownload').addEventListener('change',
                     (e) => {
-                        setSettings("max_dl_rate", e.target.value, config).then((result) => {
+                        setSettings("max_dl_rate", e.target.value).then((result) => {
                             console.log("max_dl_rate " + e.target.value);
                             console.log(result.status);
                         });
@@ -534,7 +412,7 @@
 
                 view.querySelector('#selectNumActiveDownloads').addEventListener('change', 
                     (e) => {
-                        setSettings("max_active_downloads", e.target.value, config).then((result) => {
+                        setSettings("max_active_downloads", e.target.value).then((result) => {
                             console.log("max_active_downloads " + e.target.value);
                             console.log(result.status);
                         });
@@ -542,7 +420,7 @@
 
                 view.querySelector('#selectNumActiveTorrents').addEventListener('change',
                     (e) => {
-                        setSettings("max_active_torrent", e.target.value, config).then((result) => {
+                        setSettings("max_active_torrent", e.target.value).then((result) => {
                             console.log("max_active_torrent " + e.target.value); 
                             console.log(result.status);
                         });
@@ -557,7 +435,7 @@
                 //    });
 
 
-                    Dashboard.hideLoadingMsg();
+                   
             }  
         }
 
@@ -575,9 +453,8 @@
         return function (view) {
             view.addEventListener('viewshow',
                 () => {
-                    Dashboard.showLoadingMsg(); 
-                    token = null; 
-
+                    
+                    
                     loadConfig(view);
 
                     view.querySelector('#openTorrentDialog').addEventListener('click',

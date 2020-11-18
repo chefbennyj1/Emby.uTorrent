@@ -20,10 +20,6 @@ namespace uTorrent
        [Route("/RemoveTorrent", "GET", Summary = "Remove Torrent End Point")]
         public class RemoveTorrent : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string",
-                ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-            
             [ApiMember(Name = "Id", Description = "Hash", IsRequired = true, DataType = "string",
                 ParameterType = "query", Verb = "GET")]
             public string Id { get; set; }
@@ -44,10 +40,6 @@ namespace uTorrent
         [Route("/StartTorrent", "GET", Summary = "Start Torrent End Point")]
         public class StartTorrent : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string",
-                ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-            
             [ApiMember(Name = "Id", Description = "Hash", IsRequired = true, DataType = "string",
                 ParameterType = "query", Verb = "GET")]
             public string Id { get; set; }
@@ -56,9 +48,6 @@ namespace uTorrent
         [Route("/AddTorrentUrl", "GET", Summary = "Add Torrent List End Point")]
         public class AddTorrentUrl : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-          
             [ApiMember(Name = "Url", Description = "Url", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string Url { get; set; }
         }
@@ -83,16 +72,14 @@ namespace uTorrent
         [Route("/GetSettingsData", "GET", Summary = "Torrent List End Point")]
         public class Settings : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
+            
             
         }
 
         [Route("/SetSettingsData", "GET", Summary = "Torrent List End Point")]
         public class SetSettings : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
+           
             [ApiMember(Name = "SettingName", Description = "Setting Name", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
             public string SettingName { get; set; }
             [ApiMember(Name = "SettingValue", Description = "Setting Value", IsRequired = true, DataType = "string", ParameterType = "query", Verb = "GET")]
@@ -140,7 +127,7 @@ namespace uTorrent
                     return JsonSerializer.SerializeToString(new StatusResponse()
                         { status = "No configuration present" }); 
                 }
-                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}{request.Id}";
+                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{endpoint}{request.Id}";
 
                 var client = new TorrentClient();
                 var response = client.Get(url, "application/x-www-form-urlencoded");
@@ -164,7 +151,7 @@ namespace uTorrent
                 return JsonSerializer.SerializeToString(new StatusResponse()
                     { status = "No configuration present" }); 
             }
-            var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{setSettings}&s={request.SettingName}&v={request.SettingValue}";
+            var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{setSettings}&s={request.SettingName}&v={request.SettingValue}";
             var client = new TorrentClient();
             var response = client.Get(url, "application/x-www-form-urlencoded");
             return JsonSerializer.SerializeToString(new StatusResponse()
@@ -180,7 +167,7 @@ namespace uTorrent
                 return JsonSerializer.SerializeToString(new StatusResponse()
                     { status = "No configuration present" }); 
             }
-            var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{getSettings}";
+            var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{getSettings}";
             var client = new TorrentClient();
             var response = client.Get(url, "application/json");
             if (response.StatusCode != HttpStatusCode.OK) return string.Empty;
@@ -248,7 +235,7 @@ namespace uTorrent
             try
             {
                 const string endpoint = "&action=add-url&s=";
-                var url               = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}{request.Url}";
+                var url               = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{endpoint}{request.Url}";
                 var client            = new TorrentClient();
                 var response          = client.Get(url, "application/x-www-form-urlencoded");
 
@@ -299,7 +286,7 @@ namespace uTorrent
                     return JsonSerializer.SerializeToString(new StatusResponse()
                         { status = "No configuration present" }); 
                 }
-                var url      = $"http://{config.ipAddress}:{config.port}{gui}{token}{request.Token}{endpoint}";
+                var url      = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{endpoint}";
                 var client   = new TorrentClient();
                 var response = client.Get(url, "application/x-www-form-urlencoded");
                 return JsonSerializer.SerializeToString(new StatusResponse()
