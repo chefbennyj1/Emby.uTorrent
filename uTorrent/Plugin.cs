@@ -27,15 +27,45 @@ namespace uTorrent
             {
                 new PluginPageInfo
                 {
-                    Name                 = "TorrentPluginConfigurationPage",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginConfigurationPage.html",
+                    Name                 = "TorrentPluginDownloadingConfigurationPage",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginDownloadingConfigurationPage.html",
                     EnableInMainMenu     = true,
                     DisplayName          = "µTorrent"
                 },
                 new PluginPageInfo()
                 {
-                    Name                 = "TorrentPluginConfigurationPageJS",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginConfigurationPage.js",
+                    Name                 = "TorrentPluginDownloadingConfigurationPageJS",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginDownloadingConfigurationPage.js",
+                },
+                new PluginPageInfo
+                {
+                    Name                 = "TorrentPluginSeedingConfigurationPage",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginSeedingConfigurationPage.html",
+                },
+                new PluginPageInfo()
+                {
+                    Name                 = "TorrentPluginSeedingConfigurationPageJS",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginSeedingConfigurationPage.js",
+                },
+                new PluginPageInfo()
+                {
+                    Name                 = "TorrentPluginSettingsConfigurationPage",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginSettingsConfigurationPage.html",
+                },
+                new PluginPageInfo()
+                {
+                    Name                 = "TorrentPluginSettingsConfigurationPageJS",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginSettingsConfigurationPage.js",
+                },
+                new PluginPageInfo()
+                {
+                    Name                 = "TorrentPluginUploadConfigurationPage",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginUploadConfigurationPage.html",
+                },
+                new PluginPageInfo()
+                {
+                    Name                 = "TorrentPluginUploadConfigurationPageJS",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.TorrentPluginUploadConfigurationPage.js",
                 }
             };
         }

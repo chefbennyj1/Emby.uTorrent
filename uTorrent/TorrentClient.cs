@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace uTorrent {
@@ -20,5 +21,6 @@ namespace uTorrent {
                throw new Exception("Can not create client");
             }
         }
+
     }
 }

@@ -1,0 +1,73 @@
+﻿<div data-role="page" style="align-items: center; margin: auto;" class="type-interior pluginConfigurationPage withTabs TorrentPluginSettingsConfigurationPage" data-require="emby-button,emby-input,emby-select" data-controller="__plugin/TorrentPluginSettingsConfigurationPageJS">
+    <div class="content-primary">
+        <div class="verticalSection verticalSection">
+
+            <form>
+                <div class="detailSectionHeader personalizationConfiguration">
+                    <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Credentials</h2>
+                </div>
+
+                <label for="ip">Ip Address</label>
+                <input id="ip" name="ip" class="emby-input" />
+
+                <label for="port">Port</label>
+                <input id="port" name="port" is="emby-input" />
+
+                <label for="user">User Name</label>
+                <input id="user" name="name" class="emby-input" />
+
+                <label for="pass">Password</label>
+                <input id="pass" name="pass" type="password" class="emby-input" />
+
+                <label for="finishedDownloadLocation">Finished Download Location</label>
+                <input id="finishedDownloadLocation" name="finishedDownloadLocation" class="emby-input" />
+
+                <button id="saveButton" class="raised button-submit block emby-button" style="width: 50%; margin: auto; margin-top: 2em" is="emby-button">Save</button>
+                
+                <br/>
+                <hr/>
+                <br/>
+
+                <div class="detailSectionHeader personalizationConfiguration">
+                    <h2 style="margin: .6em 0; vertical-align: middle; display: inline-block;">Advanced</h2>
+                </div>
+
+                <div class="selectContainer fldMaxUploadSpeed">
+                    <label class="selectLabel" for="selectMaxUpload">Max upload speed (kB/s):</label>
+                    <select is="emby-select" id="selectMaxUpload" label="Max upload speed (kB/s):" class="emby-select-withcolor emby-select"></select>
+                    <div class="selectArrowContainer">
+                        <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                    </div>
+                </div>
+
+                <div class="selectContainer fldMaxDownloadSpeed">
+                    <label class="selectLabel" for="selectMaxDownload">Max download speed (kB/s):</label>
+                    <select is="emby-select" id="selectMaxDownload" label="Max download speed (kB/s):" class="emby-select-withcolor emby-select"></select>
+                    <div class="selectArrowContainer">
+                        <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                    </div>
+                </div>
+
+                <div class="selectContainer fldNumDownload">
+                    <label class="selectLabel" for="selectNumActiveDownloads">Number of active downloads:</label>
+                    <select is="emby-select" id="selectNumActiveDownloads" label="Number of active downloads:" class="emby-select-withcolor emby-select"></select>
+                    <div class="selectArrowContainer">
+                        <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                    </div>
+                </div>
+
+                <div class="selectContainer fldNumTorrents">
+                    <label class="selectLabel" for="selectNumActiveTorrents">Number of active torrents:</label>
+                    <select is="emby-select" id="selectNumActiveTorrents" label="Number of active torrents:" class="emby-select-withcolor emby-select"></select>
+                    <div class="selectArrowContainer">
+                        <div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+

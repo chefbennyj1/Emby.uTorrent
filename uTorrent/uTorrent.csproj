@@ -11,14 +11,26 @@
 </PropertyGroup>
 
 <ItemGroup>
-  <None Remove="Configuration\TorrentPluginConfigurationPage.html" />
-  <None Remove="Configuration\TorrentPluginConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginDownloadingConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginSettingsConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginSettingsConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginUploadConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginUploadConfigurationPage.js" />
   <None Remove="thumb.jpg" />
 </ItemGroup>
 
 <ItemGroup>
-  <EmbeddedResource Include="Configuration\TorrentPluginConfigurationPage.html" />
-  <EmbeddedResource Include="Configuration\TorrentPluginConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginDownloadingConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginSettingsConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginSettingsConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginUploadConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginUploadConfigurationPage.js" />
   <EmbeddedResource Include="thumb.jpg" />
 </ItemGroup>
 
