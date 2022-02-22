@@ -37,31 +37,33 @@ namespace uTorrent.Api
                 Availability          = (string)t[16],
                 TorrentQueueOrder     = (string)t[17],
                 Remaining             = (string)t[18],
-                //AddedDate             = getAddedDate(dir, (string)t[2])
+                AddedDate             = GetAddedDate(dir, (string)t[2])
             });
 
             
             return list.ToList();
         }
-        
+
         ////Older versions of uTorrent doesn't have the date added parameter return in the API.
         ////We'll use the creation time of the file to get the added date for our service
-        //private static string getAddedDate(string dir, string torrentName)
-        //{
-        //    try { 
+        private static string GetAddedDate(string dir, string torrentName)
+        {
+            try
+            {
 
-        //        foreach (var folder in Directory.GetDirectories(dir))
-        //        {
-        //            if (folder == $"{dir}\\{torrentName}")
-        //            {
-        //                return File.GetCreationTime(folder).ToString("MM/dd/yyyy");
-        //            }
-        //        }
-           
-        //    } catch { }
+                foreach (var folder in Directory.GetDirectories(dir))
+                {
+                    if (folder == $"{dir}\\{torrentName}")
+                    {
+                        return File.GetCreationTime(folder).ToString("dd/MM/yyyy");
+                    }
+                }
 
-        //    return DateTime.Now.ToString("U");
-        //}
+            }
+            catch { }
+
+            return DateTime.Now.ToString("dd/MM/yyyy");
+        }
 
     }
     

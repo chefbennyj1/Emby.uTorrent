@@ -46,6 +46,6 @@
 
         public string Path                  { get; set; }
 
-        //public string AddedDate             { get; set; }
+        public string AddedDate             { get; set; }
     }
 }

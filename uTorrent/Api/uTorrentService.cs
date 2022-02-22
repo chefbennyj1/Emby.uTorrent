@@ -13,6 +13,14 @@ using uTorrent.Helpers;
 
 namespace uTorrent.Api
 {
+    public enum SortBy
+    {
+        NAME_ASCENDING = 0,
+        NAME_DESCENDING = 1,
+        DATE_ASCENDING = 2,
+        DATE_DESCENDING = 3
+    }
+
     public class UTorrentService : IService
     {
         [Route("/RemoveTorrent", "GET", Summary = "Remove Torrent End Point")]
@@ -70,6 +78,9 @@ namespace uTorrent.Api
            
             [ApiMember(Name = "IsDownloading", Description = "IsDownloading", IsRequired = false, DataType = "bool?", ParameterType = "query", Verb = "GET")]
             public bool? IsDownloading { get; set; }
+
+            [ApiMember(Name = "SortBy", Description = "SortBy", IsRequired = false, DataType = "int?", ParameterType = "query", Verb = "GET")]
+            public SortBy? SortBy { get; set; }
 
 
             public List<Torrent> torrents          { get; set; }
@@ -314,7 +325,30 @@ namespace uTorrent.Api
                         {
                             torrents.AddRange(TorrentParser.ParseTorrentListInfo(results.torrents)); //Add the new data to the master list
                         }
-                       
+
+                        if (request.SortBy.HasValue)
+                        {
+                            List<Torrent> orderList;
+                            switch (request.SortBy.Value)
+                            {
+                                case SortBy.NAME_ASCENDING:
+                                    orderList = torrents.OrderBy(t => t.Name).ToList();
+                                    break;
+                                case SortBy.NAME_DESCENDING:
+                                    orderList = torrents.OrderByDescending(t => t.Name).ToList();
+                                    break;
+                                case SortBy.DATE_ASCENDING:
+                                    orderList = torrents.OrderBy(t => t.AddedDate).ToList();
+                                    break;
+                                case SortBy.DATE_DESCENDING:
+                                    orderList = torrents.OrderByDescending(t => t.AddedDate).ToList();
+                                    break;
+                                default:
+                                    orderList = torrents.OrderBy(t => t.Name).ToList();
+                                    break;
+                            }
+                            torrents = orderList;
+                        }
                     }
                 }
                 

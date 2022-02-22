@@ -9,6 +9,27 @@
             TotalRecordCount: 0
         }
 
+        //Backend Enum:
+        //NAME_ASCENDING  = 0,
+        //NAME_DESCENDING = 1,
+        //DATE_ASCENDING  = 2,
+        //DATE_DESCENDING = 3
+
+        var directionSvg = {
+            ascending : "M7,10L12,15L17,10H7Z",
+            descending: "M7,15L12,10L17,15H7Z"
+        }
+
+        
+
+        var sortBy = {
+            name_ascending:   0, 
+            name_descending:  1,
+            date_ascending :  2,
+            date_descending:  3
+        }
+
+        var currentSort = sortBy.name_ascending;
 
         function getTabs() {
             return [
@@ -109,7 +130,7 @@
                 html += '</td>';
                 html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
                 html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
-                //html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
+                html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
                 html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
                 html += '<button id="btn_' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
                 html += '</td>';
@@ -141,8 +162,10 @@
             });
         }
         
+        
+        
         async function getUTorrentData() {
-            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit));
+            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + '&SortBy=' + currentSort));
             return result;
         }
 
@@ -209,9 +232,11 @@
                     });
             });
 
+           
+
         }
 
-       
+        
         function monitorTorrents(view) {
             setTimeout(async () => {
                 if (!loaded) return;
@@ -272,6 +297,36 @@
                     if(results) await updatePageData(view, config, results);
                     loaded = true;
                     monitorTorrents(view);
+
+                    view.querySelector('.name_sort').addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (currentSort === sortBy.name_ascending) {
+                            currentSort = sortBy.name_descending;
+                            results = await getUTorrentData();
+                            await updatePageData(view, config, results);
+                            view.querySelector('.name_sort svg').style.transform = "rotate(180deg)";
+                            return;
+                        }
+                 
+                        currentSort = sortBy.name_ascending;
+                        results = await getUTorrentData();
+                        await updatePageData(view, config, results);
+                        view.querySelector('.name_sort svg').style.transform = "rotate(0deg)";
+                    });
+
+                    view.querySelector('.date_sort').addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (currentSort === sortBy.date_ascending) {
+                            currentSort = sortBy.date_descending;
+                            results = await getUTorrentData();
+                            await updatePageData(view, config, results);
+                            return;
+                        }
+                        currentSort = sortBy.date_ascending;
+                        results = await getUTorrentData();
+                        await updatePageData(view, config, results);
+
+                    });
 
                 });
             view.addEventListener('viewhide',
