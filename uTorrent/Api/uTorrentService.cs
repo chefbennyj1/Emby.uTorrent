@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Serialization;
@@ -18,7 +19,9 @@ namespace uTorrent.Api
         NAME_ASCENDING = 0,
         NAME_DESCENDING = 1,
         DATE_ASCENDING = 2,
-        DATE_DESCENDING = 3
+        DATE_DESCENDING = 3,
+        CONTENT_MOVIE =4,
+        CONTENT_TV_SHOW = 5
     }
 
     public class UTorrentService : IService
@@ -118,6 +121,7 @@ namespace uTorrent.Api
 
         private static ISessionManager SessionManager { get; set; }
         private  static IJsonSerializer JsonSerializer  { get; set; }
+        private ILibraryManager LibraryManager { get; set; }
         private ILogger Log { get; }
         private static string CacheId { get; set; }
         
@@ -133,11 +137,12 @@ namespace uTorrent.Api
         
         //private static Timer TorrentMonitor = new Timer(UpdateTorrentData);
         //private static int MonitorUpdate = 5000;
-        public UTorrentService(IJsonSerializer json, ILogManager logMan, ISessionManager ses)
+        public UTorrentService(IJsonSerializer json, ILogManager logMan, ISessionManager ses, ILibraryManager libraryManager)
         {
             JsonSerializer = json;
             Log = logMan.GetLogger(Plugin.Instance.Name);
             SessionManager = ses;
+            LibraryManager = libraryManager;
         }
 
         // ReSharper disable MethodNameNotMeaningful
@@ -338,10 +343,16 @@ namespace uTorrent.Api
                                     orderList = torrents.OrderByDescending(t => t.Name).ToList();
                                     break;
                                 case SortBy.DATE_ASCENDING:
-                                    orderList = torrents.OrderBy(t => t.AddedDate).ToList();
+                                    orderList = torrents.OrderBy(t => DateTime.ParseExact(t.AddedDate, "dd/MM/yyyy", null)).ToList();
                                     break;
                                 case SortBy.DATE_DESCENDING:
-                                    orderList = torrents.OrderByDescending(t => t.AddedDate).ToList();
+                                    orderList = torrents.OrderByDescending(t => DateTime.ParseExact(t.AddedDate, "dd/MM/yyyy", null)).ToList();
+                                    break;
+                                case SortBy.CONTENT_MOVIE :
+                                    orderList = torrents.OrderBy(t => t.MediaInfo?.MediaType == MediaType.MOVIE).ToList();
+                                    break;
+                                case SortBy.CONTENT_TV_SHOW :
+                                    orderList = torrents.OrderBy(t => t.MediaInfo?.MediaType == MediaType.TV_SHOW).ToList();
                                     break;
                                 default:
                                     orderList = torrents.OrderBy(t => t.Name).ToList();
@@ -359,6 +370,7 @@ namespace uTorrent.Api
                 var totalRecordCount = torrents.Count;
                 var limit = request.Limit > (totalRecordCount - request.StartIndex) ? totalRecordCount - request.StartIndex : request.Limit;
                 var torrentChunk = torrents.GetRange(request.StartIndex, limit);
+                
 
                 Log.Info($"Torrent Chunk size is: {torrentChunk.Count()} of {totalRecordCount}");
                 //switch (request.SortBy)

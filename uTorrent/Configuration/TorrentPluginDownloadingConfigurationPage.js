@@ -236,7 +236,12 @@
                         console.log(err);
                     }
                     if (row) {
-                        row.innerHTML = renderTableRowHtml(result.torrents[i], true);
+                        if (result.torrents[i].Progress < 999) {
+                            row.innerHTML = renderTableRowHtml(result.torrents[i], true);
+                        } else {
+                            row.innerHTML = '';
+                        }
+                       
                     }
                 }
                 monitorTorrents(view);

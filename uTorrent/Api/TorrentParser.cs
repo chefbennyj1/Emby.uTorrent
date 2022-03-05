@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using uTorrent.Helpers;
 
 namespace uTorrent.Api
@@ -20,6 +21,7 @@ namespace uTorrent.Api
                 Status                = (string)t[1] == "201" ? "started" : (string)t[1] == "136" ? "stopped" : (string)t[1] == "233" ? "paused" : (string)t[1] == "130" ? "re-check" : "queued",
                 Name                  = (string)t[2],
                 Size                  = FileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[3])),
+                MediaInfo = GetMediaInfo((string)t[2]),
                 TotalBytes            = (string)t[3],
                 Progress              = (string)t[4],
                 Downloaded            = (string)t[5],
@@ -48,23 +50,108 @@ namespace uTorrent.Api
         ////We'll use the creation time of the file to get the added date for our service
         private static string GetAddedDate(string dir, string torrentName)
         {
+            //A Torrent file lives in a parent folder
             try
             {
-
                 foreach (var folder in Directory.GetDirectories(dir))
                 {
                     if (folder == $"{dir}\\{torrentName}")
                     {
                         return File.GetCreationTime(folder).ToString("dd/MM/yyyy");
                     }
+                    else
+                    {
+                       
+
+                    }
                 }
 
             }
             catch { }
 
+            //A torrent file exists in the root folder, and did not get a parent folder.
+            try
+            {
+                foreach (var file in Directory.GetFiles(dir))
+                {
+                    if (file.Contains(torrentName))
+                    {
+                        return File.GetCreationTime(file).ToString("dd/MM/yyyy");
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
             return DateTime.Now.ToString("dd/MM/yyyy");
         }
 
+        private static MediaInfo GetMediaInfo(string fileName)
+        {
+            var regexDate = new Regex(@"\b(19|20|21)\d{2}\b");
+            var regexTvShow = new Regex(@"(.*?)\.S?(\d{1,2})E?(\d{2})\.(.*)", RegexOptions.IgnoreCase);
+
+            
+
+            var dateMatch = regexDate.Match(fileName);
+            if (dateMatch.Success)
+            {
+                var testTvShow = new Regex(@"([Ss](\d{1,2})[Ee](\d{1,2}))", RegexOptions.IgnoreCase);
+                if (testTvShow.Matches(fileName).Count < 1)
+                {
+                    return new MediaInfo()
+                    {
+                        SortName = fileName.Split(new[] { dateMatch.Value }, StringSplitOptions.None)[0].Replace('.', ' ').TrimEnd(),
+                        Resolution = GetStreamResolutionFromFileName(fileName),
+                        MediaType = MediaType.MOVIE
+                    };
+                }
+                
+            }
+
+            var tvShowMatchCollection = regexTvShow.Matches(fileName);
+           
+            foreach (Match match in tvShowMatchCollection)
+            {
+                int.TryParse(match.Groups[2].Value, out var season);
+                int.TryParse(match.Groups[3].Value, out var episode); 
+                return new MediaInfo()
+                {
+                    SortName = match.Groups[1].Value.Replace(".", ""),
+                    Resolution = GetStreamResolutionFromFileName(fileName),
+                    Season = season,
+                    Episode = episode,
+                    MediaType = MediaType.TV_SHOW 
+                };
+            }
+            return null;
+        }
+        private static string GetStreamResolutionFromFileName(string sourceFileName)
+        {
+            var videoResolutionFlags = new[]
+            {
+                "480p",
+                "720p",
+                "1080p",
+                "2160p", 
+                "4K"
+            };
+            
+            foreach(var resolution in videoResolutionFlags)
+            {
+                if(sourceFileName.Contains(resolution))
+                {
+                    return resolution;
+
+                }
+            }
+            return string.Empty;
+            
+        }
+
+       
     }
     
 }
