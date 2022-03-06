@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Logging;
@@ -79,13 +78,13 @@ namespace uTorrent.Api
             [ApiMember(Name = "StartIndex", Description = "StartIndex", IsRequired = true, DataType = "int", ParameterType = "query", Verb = "GET")]
             public int StartIndex { get; set; }
            
-            [ApiMember(Name = "IsDownloading", Description = "IsDownloading", IsRequired = false, DataType = "bool?", ParameterType = "query", Verb = "GET")]
-            public bool? IsDownloading { get; set; }
+            [ApiMember(Name = "FilterDownloadingOnly", Description = "Filter Downloading Only", IsRequired = false, DataType = "bool?", ParameterType = "query", Verb = "GET")]
+            public bool? FilterDownloadingOnly { get; set; }
 
             [ApiMember(Name = "SortBy", Description = "SortBy", IsRequired = false, DataType = "int?", ParameterType = "query", Verb = "GET")]
             public SortBy? SortBy { get; set; }
 
-
+            //public List<RssFeed> RssFeeds { get; set; }
             public List<Torrent> torrents          { get; set; }
             public string sizeDownload             { get; set; }
             public string sizeSuffixDownload       { get; set; }
@@ -262,10 +261,10 @@ namespace uTorrent.Api
                         var data = sr.ReadToEnd();
 
                         var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
-
+                        
                         CacheId = results.torrentc;
 
-                        torrents.AddRange(TorrentParser.ParseTorrentListInfo(results.torrentp)); 
+                        torrents.AddRange(TorrentParser.ParseTorrentData(results.torrentp)); 
                         var totalDownloadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32((string) t.DownloadSpeed))).Split(' ');
                         var totalUploadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
                         var totalRecordCount = torrents.Count;
@@ -290,6 +289,7 @@ namespace uTorrent.Api
         public string Get(TorrentData request)
         {
             var torrents = new List<Torrent>();
+            //var rssFeed = new List<RssFeed>();
             var config = Plugin.Instance.Configuration;
             if (config.userName is null)
             {
@@ -306,29 +306,27 @@ namespace uTorrent.Api
                 {
                     if (receiveStream == null) return string.Empty;
 
-                    using (var sr = new StreamReader(receiveStream,
-                        Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
+                    using (var sr = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet ?? throw new InvalidOperationException())))
                     {
                         var data = sr.ReadToEnd();
 
                         var results = JsonSerializer.DeserializeFromString<UTorrentResponse>(data);
 
                         CacheId = results.torrentc;
-                        
-                        
 
-                        if (request.IsDownloading.HasValue)
+                        if (request.FilterDownloadingOnly.HasValue)
                         {
-                            if (request.IsDownloading.Value)
+                            if (request.FilterDownloadingOnly.Value)
                             {
                                 var temp = new List<Torrent>();
-                                temp.AddRange(TorrentParser.ParseTorrentListInfo(results.torrents)); //Add the new data to the master list
+                                temp.AddRange(TorrentParser.ParseTorrentData(results.torrents)); //Add the new data to the master list
                                 torrents = temp.Where(t => Convert.ToInt32(t.Progress) < 1000).ToList();
                             }
                         }
                         else
                         {
-                            torrents.AddRange(TorrentParser.ParseTorrentListInfo(results.torrents)); //Add the new data to the master list
+                            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents)); //Add the new data to the master list
+                            //rssFeed.AddRange(TorrentParser.ParseTorrentRssFeed(results.rssfeeds));
                         }
 
                         if (request.SortBy.HasValue)
@@ -373,15 +371,10 @@ namespace uTorrent.Api
                 
 
                 Log.Info($"Torrent Chunk size is: {torrentChunk.Count()} of {totalRecordCount}");
-                //switch (request.SortBy)
-                //{
-                //    //case "DateAdded" : Torrents = Torrents.OrderBy(t => DateTime.Parse(t.AddedDate)).Reverse().ToList(); break;
-                //    //case "Name"      : Torrents = Torrents.OrderBy(t => t.Name).ToList(); break;
-                //    //case "FileSize"  : Torrents = Torrents.OrderBy(t => Convert.ToInt64(t.TotalBytes)).Reverse().ToList(); break;
-                //}
-
+                
                 return JsonSerializer.SerializeToString(new TorrentData()
                 {
+                    //RssFeeds = rssFeed,
                     torrents = torrentChunk,
                     TotalRecordCount = totalRecordCount,
                     sizeDownload = totalDownloadRate[0],
@@ -577,7 +570,7 @@ namespace uTorrent.Api
                         //This means we have to replace the data stored in our "List<Torrent> torrents" which matches the new data returned in torrentp list from the api.
 
                         var torrentListChanges =
-                            TorrentParser.ParseTorrentListInfo(
+                            TorrentParser.ParseTorrentData(
                                 Torrents.Count <= 0 ? results.torrents : results.torrentp);
 
                         if (Torrents.Count <= 0)

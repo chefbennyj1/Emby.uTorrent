@@ -60,6 +60,7 @@
                         var activeTorrents = view.querySelector('#selectNumActiveTorrents');
                         var upload = view.querySelector('#selectMaxUpload');
                         var download = view.querySelector('#selectMaxDownload');
+                        var seedRatio = view.querySelector('#seedRatio');
 
                         var result;
                         
@@ -88,6 +89,7 @@
                             var settingsActiveDownloadCount = settings[52];
                             var settingsActiveTorrentsCount = settings[51];
                             var stateCommand                = settings[72];
+                            var settingsSeedRatio           = settings[56];
 
                             console.log(stateCommand[2]);
 
@@ -95,7 +97,7 @@
                             upload.value = settingsUploadSpeed[2];
                             activeDownloads.value = settingsActiveDownloadCount[2];
                             activeTorrents.value = settingsActiveTorrentsCount[2];
-
+                            seedRatio.value = settingsSeedRatio[2];
                         }
 
                         view.querySelector('#selectMaxUpload').addEventListener('change',
@@ -123,6 +125,13 @@
                             async (e) => {
                                 var result = await setSettings("max_active_torrent", e.target.value);
                                 console.log("max_active_torrent " + e.target.value);
+                                console.log(result.status);
+                            });
+
+                        view.querySelector('#seedRatio').addEventListener('input',
+                            async (e) => {
+                                var result = await setSettings("seed_ratio", e.target.value);
+                                console.log("seed_ratio " + e.target.value);
                                 console.log(result.status);
                             });
 

@@ -166,12 +166,16 @@
             html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
             html += '<td data-title="Speed" class="detailTableBodyCell fileCell">' + torrent.DownloadSpeedFriendly + '/s</td>';
             html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
-            html += '<div style="display:flex;align-items:center;">';
-            html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
-            html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
+            
+            html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
+            html += '<canvas id="chart_' + torrent.Hash + '" width="100" height="100" style="max-width:50px"></canvas>';
             html += '</div>';
-            html += '</div>';
-            html += '</div>';
+            //html += '<div style="display:flex;align-items:center;">';
+            //html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
+            //html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
+            //html += '</div>';
+            //html += '</div>';
+            //html += '</div>'; 
             html += '</td>';
             html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
@@ -195,10 +199,35 @@
             return html;
         }
 
-        function getTorrentResultTableHtml(torrents) {
+        function getTorrentResultTableHtml(torrents, view) {
             var html = '';
+            var style = getComputedStyle(document.body);
             torrents.forEach(torrent => {
                 html += renderTableRowHtml(torrent, false);
+
+                require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
+                    var progressCtx = view.querySelector('#chart_' + torrent.Hash).getContext("2d");
+                    new Chart(progressCtx,
+                        {
+                            type: 'doughnut',
+                            label: "Progress",
+                            data: {
+                                datasets: [
+                                    {
+                                        data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
+                                        backgroundColor: [style.getPropertyValue("--theme-primary-color"), "transparent"],
+                                        borderColor: ["black", style.getPropertyValue("--theme-primary-color")],
+                                        borderWidth: 1,
+                                        //dataFriendly   : [ driveData[t].FriendlyUsed, driveData[t].FriendlyAvailable ]
+                                    }
+                                ]
+                            },
+                            options: { cutoutPercentage: 50 }
+                        });
+                });
+
+
+
             });
             return html;
         }
@@ -270,7 +299,7 @@
                 });
 
            
-            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
+            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents, view);
 
             Dashboard.hideLoadingMsg();
 

@@ -142,7 +142,7 @@
         }
         
         async function getUTorrentData() {
-            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + "&IsDownloading=true"));
+            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + "&FilterDownloadingOnly=true"));
             return result;
         }
 

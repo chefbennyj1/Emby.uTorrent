@@ -9,7 +9,26 @@ namespace uTorrent.Api
 {
     public class TorrentParser
     {
-        public static List<Torrent> ParseTorrentListInfo(List<object[]> obj)
+        [Flags]
+        public enum Status
+        {
+            STARTED = 1 << 0,           //   1
+            CHECKING = 1 << 1,          //   2
+            START_AFTER_CHECK = 1 << 2, //   4
+            CHECKED = 1 << 3,           //   8
+            ERROR = 1 << 4,             //  16
+            PAUSED = 1 << 5,            //  32
+            QUEUED = 1 << 6,            //  64
+            LOADED = 1 << 7,            // 128
+        }
+
+        //GetStatus((string)t[1]).ToString(), 
+        private static Status GetStatus(string v)
+        {
+            Enum.TryParse(v, out Status result);
+            return result;
+        }
+        public static List<Torrent> ParseTorrentData(List<object[]> obj)
         {
             var config = Plugin.Instance.Configuration;
             var dir    = config.FinishedDownloadsLocation ?? string.Empty;
@@ -43,6 +62,23 @@ namespace uTorrent.Api
             });
 
             
+            return list.ToList();
+        }
+
+        public static List<RssFeed> ParseTorrentRssFeed(List<object[]> obj)
+        {
+            var list = obj.Select(rss => new RssFeed()
+            {
+                FeedId = (string)rss[0],
+                Enabled = (string)rss[1],
+                UseFeedTitle = (string)rss[2],
+                UserSelected = (string)rss[3],
+                Programmed = (string)rss[4],
+                DownloadState = (string)rss[5],
+                Url = ((string)rss[6]).Split('|')[1],
+                Name = ((string)rss[6]).Split('|')[0],
+                NextUpdate = TimeSpan.FromMilliseconds((double)rss[7]).ToString("hh:mm:ss"),
+            });
             return list.ToList();
         }
 
