@@ -3,23 +3,27 @@
         <div class="verticalSection verticalSection">
             <div class="sectionTitleContainer sectionTitleContainer-cards align-items-center">
                 
-                <hr />
-                <br />
+                <div style="width: 100%; height: 20em">
+                    <canvas id="chart_download_progress" style="height: 100%; width:100%"></canvas>
+                </div>
+
+                <hr/>
+                <br/>
                 <div class="pagingContainer" style="display: flex; justify-content: center; align-items: center"></div>
                 <table class="tblTorrentResults table detailTable" style="width: 100%;">
                     <thead>
-                        <tr style="text-align: left;">
-                            <th class="detailTableHeaderCell" data-priority="2"></th> <!--Status-->
-                            <th class="detailTableHeaderCell" data-priority="3">File Name</th>
-                            <th class="detailTableHeaderCell" data-priority="1">Size</th>
-                            <th class="detailTableHeaderCell" data-priority="1">Speed</th>
-                            <th class="detailTableHeaderCell" data-priority="1">Progress</th>
-                            <th class="detailTableHeaderCell" data-priority="1">Complete</th>
-                            <th class="detailTableHeaderCell" data-priority="1">ETA</th>
-                            <!--<th class="detailTableHeaderCell" data-priority="1">Date Added</th>-->
-                            <th class="detailTableHeaderCell" data-priority="1">Remove</th>
-                            <th class="detailTableHeaderCell" data-priority="1"></th>
-                        </tr>
+                    <tr style="text-align: left;">
+                        <th class="detailTableHeaderCell" data-priority="2"></th> <!--Status-->
+                        <th class="detailTableHeaderCell" data-priority="3">File Name</th>
+                        <th class="detailTableHeaderCell" data-priority="1">Size</th>
+                        <th class="detailTableHeaderCell" data-priority="1">Speed</th>
+                        <th class="detailTableHeaderCell" data-priority="1">Progress</th>
+                        <th class="detailTableHeaderCell" data-priority="1">Complete</th>
+                        <th class="detailTableHeaderCell" data-priority="1">ETA</th>
+                        <!--<th class="detailTableHeaderCell" data-priority="1">Date Added</th>-->
+                        <th class="detailTableHeaderCell" data-priority="1">Remove</th>
+                        <th class="detailTableHeaderCell" data-priority="1"></th>
+                    </tr>
                     </thead>
                     <tbody class="torrentResultBody"></tbody>
                 </table>

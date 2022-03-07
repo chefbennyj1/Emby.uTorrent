@@ -195,6 +195,8 @@
            
             view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
 
+            renderChart(results, view);
+
             Dashboard.hideLoadingMsg();
 
             view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
@@ -211,7 +213,74 @@
 
         }
 
+        var downloadChart;
+
+        function updateChartData(label, data) {
+            
+            downloadChart.data.labels.push(label);
+            downloadChart.data.datasets.forEach((dataset) => {
+                if(dataset.yAxisId == "y") dataset.data.push(data.sizeDownload);
+                if(dataset.yAxisId == "y2") dataset.data.push(data.sizeUpload);
+            });
+            
+            if (downloadChart.data.labels.length > 4) {
+                downloadChart.data.labels.shift();
+                downloadChart.data.datasets.forEach((dataset) => {
+                    dataset.data.shift(); 
+                
+                });
+            } 
+            
+            
+
+            downloadChart.update();
+        }
+
+        //function removeData() {
+        //    downloadChart.data.labels.pop();
+        //    downloadChart.data.datasets.forEach((dataset) => {
+        //        dataset.data.pop();
+        //    });
+        //    downloadChart.update();
+        //}
+
+        function renderChart(result, view) {
+            //var style = getComputedStyle(document.body);
+            require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
+                var progressCtx = view.querySelector('#chart_download_progress').getContext("2d");
+                var current = new Date();
+                var time = current.toLocaleTimeString();
+                downloadChart = new Chart(progressCtx, {
+                    type: 'line',
+                    label: "Speed",
+                    tension: 1,
+                    data: {
+                        labels: [time],
+                        datasets: [
+                            {
+                                label: "Download",
+                                fill: false,
+                                backgroundColor:"red",
+                                borderColor: "red",
+                                data: [result.sizeDownload],
+                                yAxisId: "y"
+                            },
+                            {
+                                label: "Upload",
+                                fill: false,
+                                backgroundColor:"lightblue",
+                                borderColor:"lightblue",
+                                data: [result.sizeUpload],
+                                yAxisId: "y2"
+                            }
+                        ]
+                    }
+                });
+            });
+        }
        
+        
+
         function monitorTorrents(view) {
             setTimeout(async () => {
                 if (!loaded) return;
@@ -222,8 +291,10 @@
                 //var paths = table.querySelectorAll('svg path');
                 //for (let i = 0; i <= paths.length-1; i++) {
                 //    paths[i].setAttribute('fill', "currentColor");
-                //}
-
+                //} 
+                var current = new Date();
+                var time = current.toLocaleTimeString();
+                updateChartData(time, result);
 
                 for(let i = 0; i <= result.torrents.length-1; i++) {
                     var row;
@@ -237,6 +308,8 @@
                     }
                     if (row) {
                         if (result.torrents[i].Progress < 999) {
+                            
+                            //removeData();
                             row.innerHTML = renderTableRowHtml(result.torrents[i], true);
                         } else {
                             row.innerHTML = '';
@@ -244,6 +317,8 @@
                        
                     }
                 }
+
+
                 monitorTorrents(view);
 
             }, 5000);

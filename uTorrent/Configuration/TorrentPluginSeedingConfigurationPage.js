@@ -34,7 +34,7 @@
         }
 
         var currentSort = sortBy.date_descending;
-
+        
         function getTabs() {
             return [
                 {
@@ -80,15 +80,27 @@
             return html;
         }
 
+        function getResolutionIcon(resolution) {
+            switch (resolution) {
+                case "1080p":
+                    return '<svg x="0px" y="0px" viewBox="0 0 290.262 290.262" style="enable-background:new 0 0 290.262 290.262;width: 36px;background-color: black;" fill="goldenrod" xml:space="preserve"><g id="_x34_2-_1080_Full_HD"><path d="M278.743,29.29H11.519C5.157,29.29,0,34.447,0,40.809v128.645v11.355v68.645c0,6.361,5.157,11.519,11.519,11.519h267.225   c6.361,0,11.519-5.157,11.519-11.519v-68.645v-11.355V40.809C290.262,34.447,285.104,29.29,278.743,29.29z M56.563,185.959H33.751   v15.375H54.19v4.813H33.751v18.748h-4.996v-43.748h27.809V185.959z M99.69,206.895c0,11.375-6.875,18.252-18.313,18.252   c-11.5,0-18.436-6.877-18.436-18.252v-25.748h5v25.748c0,8.5,5.122,13.439,13.436,13.439c8.313,0,13.313-4.939,13.313-13.439   v-25.748h5V206.895z M136.13,224.895h-24.188v-43.748h5v39.002h19.188V224.895z M168.444,224.895h-24.187v-43.748h4.998v39.002   h19.189V224.895z M214.693,224.895h-11.126v-16.998h-18.121v16.998h-11.127v-43.748h11.127v18h18.121v-18h11.126V224.895z    M241.822,224.895h-18.376v-25.201h11.125v16.33h7.939c6.811,0,11.688-5.254,11.688-12.939c0-7.754-5.126-13.063-12.189-13.063   h-18.563v-8.875h18.813c13.75,0,23.248,8.875,23.248,21.873C265.507,215.957,255.882,224.895,241.822,224.895z M267.225,157.935   H23.037V52.327h244.188V157.935z"/><polygon points="53.415,128.666 66.592,128.666 66.592,76.775 43.866,76.775 43.866,87.363 53.415,87.363  "/><path d="M99.901,129.037c14.656,0,22.873-9.404,22.873-26.354c0-16.877-8.217-26.279-22.873-26.279   c-14.805,0-23.021,9.402-23.021,26.279C76.88,119.633,85.097,129.037,99.901,129.037z M99.901,86.029c6.514,0,9.4,4.813,9.4,16.654   s-2.887,16.729-9.4,16.729c-6.664,0-9.475-4.887-9.475-16.729S93.237,86.029,99.901,86.029z"/> <path d="M128.401,114.232c0,9.178,8.29,15.025,21.246,15.025c12.951,0,21.243-5.922,21.243-15.25   c0-5.771-3.552-10.732-9.253-13.102c4.072-2.221,6.514-6.217,6.514-10.734c0-8.512-7.18-13.914-18.58-13.914   c-11.25,0-18.505,5.258-18.505,13.549c0,4.512,2.814,8.656,7.18,11.1C132.251,103.275,128.401,108.307,128.401,114.232z    M149.647,84.918c4.811,0,7.475,2.148,7.475,5.994c0,3.703-2.664,5.777-7.475,5.777c-4.813,0-7.477-2.074-7.477-5.777   C142.17,87.066,144.835,84.918,149.647,84.918z M149.647,106.164c5.697,0,8.881,2.441,8.881,6.736c0,4.441-3.184,6.811-8.881,6.811   c-5.701,0-8.809-2.445-8.809-6.811C140.839,108.605,143.946,106.164,149.647,106.164z"/> <path d="M199.466,129.037c14.655,0,22.872-9.404,22.872-26.354c0-16.877-8.217-26.279-22.872-26.279   c-14.805,0-23.023,9.402-23.023,26.279C176.443,119.633,184.661,129.037,199.466,129.037z M199.466,86.029   c6.514,0,9.398,4.813,9.398,16.654s-2.885,16.729-9.398,16.729c-6.662,0-9.475-4.887-9.475-16.729S192.804,86.029,199.466,86.029z"/><path d="M234.948,121.119h4.865c6.857,0,10.803-3.641,10.803-9.924c0-5.973-3.945-9.346-10.803-9.346h-11.682v26.816h6.816V121.119   z M234.948,107.213h4.521c2.987,0,4.712,1.414,4.712,4.217c0,2.832-1.725,4.326-4.712,4.326h-4.521V107.213z"/></g></svg>';
+                case "720p":
+                    return "";
+                case "2160p":
+                    return '<svg x="0px" y="0px" viewBox="0 0 290.262 290.262" style="enable-background:new 0 0 290.262 290.262;width: 36px;background-color: black;" fill="goldenrod" xml:space="preserve"><g id="_x34_3-4k_Full_HD"><path d="M278.743,29.29H11.519C5.157,29.29,0,34.447,0,40.809v128.645v11.355v68.645c0,6.361,5.157,11.519,11.519,11.519h267.225   c6.361,0,11.519-5.157,11.519-11.519v-68.645v-11.355V40.809C290.262,34.447,285.104,29.29,278.743,29.29z M56.563,185.959H33.751   v15.375H54.19v4.813H33.751v18.748h-4.996v-43.748h27.809V185.959z M99.69,206.895c0,11.375-6.875,18.252-18.313,18.252   c-11.5,0-18.436-6.877-18.436-18.252v-25.748h5v25.748c0,8.5,5.122,13.439,13.436,13.439c8.313,0,13.313-4.939,13.313-13.439   v-25.748h5V206.895z M136.13,224.895h-24.188v-43.748h5v39.002h19.188V224.895z M168.444,224.895h-24.188v-43.748h4.998v39.002   h19.189V224.895z M214.693,224.895h-11.126v-16.998h-18.121v16.998h-11.127v-43.748h11.127v18h18.121v-18h11.126V224.895z    M241.822,224.895h-18.376v-25.201h11.125v16.33h7.938c6.812,0,11.688-5.254,11.688-12.939c0-7.754-5.126-13.063-12.188-13.063   h-18.563v-8.875h18.813c13.75,0,23.248,8.875,23.248,21.873C265.507,215.957,255.882,224.895,241.822,224.895z M267.225,157.935   H23.037V52.327h244.188V157.935z"/><polygon points="106.752,143.336 125.882,143.336 125.882,125.48 136.895,125.48 136.895,109.83 125.882,109.83 125.882,92.439    106.752,92.439 106.752,109.83 89.594,109.83 113.708,62.18 93.883,62.18 68.261,111.686 68.261,125.48 106.752,125.48  "/><polygon points="167.275,123.395 178.057,111.453 199.505,143.336 224.199,143.336 192.085,95.801 222.229,62.18 198.346,62.18    167.275,97.309 167.275,62.18 146.638,62.18 146.638,143.336 167.275,143.336  "/></g></svg>';
+
+            }
+        }
+
         function getResultContentTypeIcon(type) {
             switch (type) {
             case "UNKNOWN": return '';
             case "MOVIE":
-                return '<path fill="darkgreen" d="M14.75 5.46L12 1.93L13.97 1.54L16.71 5.07L14.75 5.46M21.62 4.1L20.84 .18L16.91 .96L19.65 4.5L21.62 4.1M11.81 6.05L9.07 2.5L7.1 2.91L9.85 6.44L11.81 6.05M2 8V18C2 19.11 2.9 20 4 20H20C21.11 20 22 19.11 22 18V8H2M4.16 3.5L3.18 3.69C2.1 3.91 1.4 4.96 1.61 6.04L2 8L6.9 7.03L4.16 3.5M11 24H13V22H11V24M7 24H9V22H7V24M15 24H17V22H15V24Z" />';
+                return '<path fill="var(--theme-primary-color)" d="M14.75 5.46L12 1.93L13.97 1.54L16.71 5.07L14.75 5.46M21.62 4.1L20.84 .18L16.91 .96L19.65 4.5L21.62 4.1M11.81 6.05L9.07 2.5L7.1 2.91L9.85 6.44L11.81 6.05M2 8V18C2 19.11 2.9 20 4 20H20C21.11 20 22 19.11 22 18V8H2M4.16 3.5L3.18 3.69C2.1 3.91 1.4 4.96 1.61 6.04L2 8L6.9 7.03L4.16 3.5M11 24H13V22H11V24M7 24H9V22H7V24M15 24H17V22H15V24Z" />';
             case "TV_SHOW":
-                return '<path fill="darkgreen" d="M8.16,3L6.75,4.41L9.34,7H4C2.89,7 2,7.89 2,9V19C2,20.11 2.89,21 4,21H20C21.11,21 22,20.11 22,19V9C22,7.89 21.11,7 20,7H14.66L17.25,4.41L15.84,3L12,6.84L8.16,3M4,9H17V19H4V9M19.5,9A1,1 0 0,1 20.5,10A1,1 0 0,1 19.5,11A1,1 0 0,1 18.5,10A1,1 0 0,1 19.5,9M19.5,12A1,1 0 0,1 20.5,13A1,1 0 0,1 19.5,14A1,1 0 0,1 18.5,13A1,1 0 0,1 19.5,12Z" />'; 
+                return '<path fill="var(--theme-primary-color)" d="M8.16,3L6.75,4.41L9.34,7H4C2.89,7 2,7.89 2,9V19C2,20.11 2.89,21 4,21H20C21.11,21 22,20.11 22,19V9C22,7.89 21.11,7 20,7H14.66L17.25,4.41L15.84,3L12,6.84L8.16,3M4,9H17V19H4V9M19.5,9A1,1 0 0,1 20.5,10A1,1 0 0,1 19.5,11A1,1 0 0,1 18.5,10A1,1 0 0,1 19.5,9M19.5,12A1,1 0 0,1 20.5,13A1,1 0 0,1 19.5,14A1,1 0 0,1 18.5,13A1,1 0 0,1 19.5,12Z" />'; 
             case "SONG":
-                return '<path fill="darkgreen" d="M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z" />';
+                return '<path fill="var(--theme-primary-color)" d="M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z" />';
             }
         }
 
@@ -157,7 +169,7 @@
             html += '<td data-title="Name" class="detailTableBodyCell fileCell">' + (torrent.MediaInfo ? torrent.MediaInfo.SortName : "") + '</td>';
 
             html += '<td data-title="Content" class="detailTableBodyCell fileCell">';
-            html += '<svg style="width:24px;height:24px" viewBox="0 0 24 24">';
+            html += '<svg style="height:24px" viewBox="0 0 24 24">';
             html += torrent.MediaInfo ? getResultContentTypeIcon(torrent.MediaInfo.MediaType) : "";
             html += '</svg>';
             html += '</td>';
@@ -168,7 +180,7 @@
             html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
             
             html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
-            html += '<canvas id="chart_' + torrent.Hash + '" width="100" height="100" style="max-width:50px"></canvas>';
+            html += '<canvas id="chart_' + torrent.Hash + '_progress" width="100" height="100" style="max-width:50px"></canvas>';
             html += '</div>';
             //html += '<div style="display:flex;align-items:center;">';
             //html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
@@ -180,13 +192,20 @@
             html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">';
+
+            //html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
+            //html += '<canvas id="chart_' + torrent.Hash + '_ratio" width="100" height="100" style="max-width:50px"></canvas>';
+            //html += '</div>';
             html += '<svg style="width:24px;height:24px" viewBox="0 0 24 24">';
+            
             if (torrent.Ratio / 100 > 1) {
                 html += '<path fill="var(--theme-primary-color)" d="M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M16.53,11.06L15.47,10L10.59,14.88L8.47,12.76L7.41,13.82L10.59,17L16.53,11.06Z" />';
             } else {
                 html += '<path fill="goldenrod" d="M15,13H16.5V15.82L18.94,17.23L18.19,18.53L15,16.69V13M19,8H5V19H9.67C9.24,18.09 9,17.07 9,16A7,7 0 0,1 16,9C17.07,9 18.09,9.24 19,9.67V8M5,21C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V11.1C22.24,12.36 23,14.09 23,16A7,7 0 0,1 16,23C14.09,23 12.36,22.24 11.1,21H5M16,11.15A4.85,4.85 0 0,0 11.15,16C11.15,18.68 13.32,20.85 16,20.85A4.85,4.85 0 0,0 20.85,16C20.85,13.32 18.68,11.15 16,11.15Z" />';
             }
+
             html += '</svg>';
+
             html += '</td>';
             html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
             //html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
@@ -199,19 +218,23 @@
             return html;
         }
 
-        function getTorrentResultTableHtml(torrents, view) {
+        async function getTorrentResultTableHtml(torrents, view) {
             var html = '';
             var style = getComputedStyle(document.body);
-            torrents.forEach(torrent => {
+           
+            torrents.forEach(async torrent => {
                 html += renderTableRowHtml(torrent, false);
 
                 require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
-                    var progressCtx = view.querySelector('#chart_' + torrent.Hash).getContext("2d");
+                    var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
+                    
+
                     new Chart(progressCtx,
                         {
                             type: 'doughnut',
                             label: "Progress",
                             data: {
+                                //labels  : [ 'Complete', 'Size' ],
                                 datasets: [
                                     {
                                         data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
@@ -245,12 +268,11 @@
             });
         }
         
-        
-        
         async function getUTorrentData() {
             const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + '&SortBy=' + currentSort));
             return result;
         }
+       
 
         function remoteControlTorrent(remoteCommand, id, config) {
             return new Promise((resolve, reject) => {
@@ -299,7 +321,7 @@
                 });
 
            
-            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents, view);
+            view.querySelector('.torrentResultBody').innerHTML = await getTorrentResultTableHtml(results.torrents, view);
 
             Dashboard.hideLoadingMsg();
 
