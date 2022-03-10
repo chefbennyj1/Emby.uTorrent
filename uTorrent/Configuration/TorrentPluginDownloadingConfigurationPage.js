@@ -1,11 +1,11 @@
-﻿                                                                                               define(["loading", "dialogHelper",  "mainTabsManager","formDialogStyle"],
+﻿define(["loading", "dialogHelper", "mainTabsManager", "formDialogStyle"],
     function (loading, dialogHelper, mainTabsManager) {
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
         var loaded;
         var pagination = {
-            StartIndex      : 0,
-            Limit           : 25,
+            StartIndex: 0,
+            Limit: 25,
             TotalRecordCount: 0
         }
 
@@ -63,10 +63,10 @@
 
             switch (torrent.Status) {
                 //play icon
-                case 'started': html += '<path fill="var(--theme-primary-color)" d="M8,5.14V19.14L19,12.14L8,5.14Z" />';   
+                case 'started': html += '<path fill="var(--theme-primary-color)" d="M8,5.14V19.14L19,12.14L8,5.14Z" />';
                     break;
                 //stop icon
-                case 'stopped': html += '<path fill="darkred" d="M18,18H6V6H18V18Z" />'; 
+                case 'stopped': html += '<path fill="darkred" d="M18,18H6V6H18V18Z" />';
                     break;
                 //pause icon
                 case 'paused': html += '<path fill="goldenrod" d="M22 12C22 6.46 17.54 2 12 2C10.83 2 9.7 2.19 8.62 2.56L9.32 4.5C10.17 4.16 11.06 3.97 12 3.97C16.41 3.97 20.03 7.59 20.03 12C20.03 16.41 16.41 20.03 12 20.03C7.59 20.03 3.97 16.41 3.97 12C3.97 11.06 4.16 10.12 4.5 9.28L2.56 8.62C2.19 9.7 2 10.83 2 12C2 17.54 6.46 22 12 22C17.54 22 22 17.54 22 12M5.47 7C4.68 7 3.97 6.32 3.97 5.47C3.97 4.68 4.68 3.97 5.47 3.97C6.32 3.97 7 4.68 7 5.47C7 6.32 6.32 7 5.47 7M9 9H11V15H9M13 9H15V15H13" />';
@@ -88,51 +88,82 @@
                         }
                         break;
                     }
-                   
+
             }
 
-                //}
+            //}
 
-                html += '</svg>';
-                html += '</td>';
+            html += '</svg>';
+            html += '</td>';
 
-                html += '<td data-title="Name" class="detailTableBodyCell fileCell">' + torrent.Name + '</td>';
-                html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
-                html += '<td data-title="Speed" class="detailTableBodyCell fileCell">' + torrent.DownloadSpeedFriendly + '/s</td>';
-                html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
-                html += '<div style="display:flex;align-items:center;">';
-                html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
-                html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
-                html += '</div>';
-                html += '</div>';
-                html += '</div>';
-                html += '</td>';
-                html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
-                html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
-                //html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
-                html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
-                html += '<button id="btn_' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
-                html += '</td>';
+            html += '<td data-title="Name" class="detailTableBodyCell fileCell">' + torrent.Name + '</td>';
+            html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
+            html += '<td data-title="Speed" class="detailTableBodyCell fileCell">' + torrent.DownloadSpeedFriendly + '/s</td>';
 
-                html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
+            html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
+            html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
+            html += '<canvas id="chart_' + torrent.Hash + '_progress" width="100" height="100" style="max-width:50px"></canvas>';
+            html += '</div>';
+            //html += '<div style="display:flex;align-items:center;">';
+            //html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
+            //html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
+            //html += '</div>';
+            //html += '</div>';
+            //html += '</div>';
+            html += '</td>';
+            html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
+            html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
+            //html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
+            html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
+            html += '<button id="btn_' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
+            html += '</td>';
 
-                html += '</tr>';
-                return html;
+            html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
+
+            html += '</tr>';
+            return html;
         }
 
-        function getTorrentResultTableHtml(torrents) {
+        function getTorrentResultTableHtml(torrents, view) {
             var html = '';
+            var style = getComputedStyle(document.body);
             torrents.forEach(torrent => {
                 html += renderTableRowHtml(torrent, false);
+
+                require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
+
+                    var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
+                    new Chart(progressCtx,
+                        {
+                            type: 'doughnut',
+                            label: "Progress",
+                            data: {
+                                //labels  : [ 'Complete', 'Size' ],
+                                datasets: [
+                                    {
+                                        data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
+                                        backgroundColor: [style.getPropertyValue("--theme-primary-color"), "transparent"],
+                                        borderColor: ["black", style.getPropertyValue("--theme-primary-color")],
+                                        borderWidth: 1,
+                                        //dataFriendly   : [ driveData[t].FriendlyUsed, driveData[t].FriendlyAvailable ]
+                                    }
+                                ]
+                            },
+                            options: { cutoutPercentage: 50 }
+                        });
+
+                });
+
             });
             return html;
         }
-        
+
+
         async function getTorrentUpdates() {
             const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentDataUpdate"));
             return result;
         }
-        
+
         function removeTorrent(hash, config) {
             return new Promise((resolve, reject) => {
                 ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash)).then((result) => {
@@ -140,7 +171,7 @@
                 });
             });
         }
-        
+
         async function getUTorrentData() {
             const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + "&FilterDownloadingOnly=true"));
             return result;
@@ -160,8 +191,8 @@
                     encodeURIComponent(config.password) +
                     "&Id=" +
                     id)).then((response) => {
-                    resolve(response.status);
-                });
+                        resolve(response.status);
+                    });
             });
         }
 
@@ -171,7 +202,7 @@
             pagination.TotalRecordCount = results.TotalRecordCount;
             pagingContainer.innerHTML = '';
             pagingContainer.innerHTML += getPagingHtml();
-            
+
             view.querySelector('.btnPreviousPage').addEventListener('click',
                 async (btn) => {
                     btn.preventDefault();
@@ -192,10 +223,12 @@
                     await updatePageData(view, config, results);
                 });
 
-           
-            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents);
 
-            renderChart(results, view);
+            view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents, view);
+
+
+
+            //renderNetworkChart(results, view);
 
             Dashboard.hideLoadingMsg();
 
@@ -215,52 +248,44 @@
 
         var downloadChart;
 
-        function updateChartData(label, data) {
-            
+        function updateNetworkChartData(label, data) {
+
             downloadChart.data.labels.push(label);
             downloadChart.data.datasets.forEach((dataset) => {
-                if(dataset.yAxisId == "y") dataset.data.push(data.sizeDownload);
-                if(dataset.yAxisId == "y2") dataset.data.push(data.sizeUpload);
+                if (dataset.yAxisId == "y") dataset.data.push(data.sizeDownload);
+                if (dataset.yAxisId == "y2") dataset.data.push(data.sizeUpload);
             });
-            
-            if (downloadChart.data.labels.length > 4) {
+
+            if (downloadChart.data.labels.length > 20) {
                 downloadChart.data.labels.shift();
                 downloadChart.data.datasets.forEach((dataset) => {
-                    dataset.data.shift(); 
-                
+                    dataset.data.shift();
+
                 });
-            } 
-            
-            
+            }
+
+
 
             downloadChart.update();
         }
 
-        //function removeData() {
-        //    downloadChart.data.labels.pop();
-        //    downloadChart.data.datasets.forEach((dataset) => {
-        //        dataset.data.pop();
-        //    });
-        //    downloadChart.update();
-        //}
-
-        function renderChart(result, view) {
+        function renderNetworkChart(result, view) {
             //var style = getComputedStyle(document.body);
             require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
-                var progressCtx = view.querySelector('#chart_download_progress').getContext("2d");
+                var download_uploadCtx = view.querySelector('#chart_download_progress').getContext("2d");
                 var current = new Date();
                 var time = current.toLocaleTimeString();
-                downloadChart = new Chart(progressCtx, {
+                downloadChart = new Chart(download_uploadCtx, {
                     type: 'line',
                     label: "Speed",
-                    tension: 1,
+                    tension: 0,
                     data: {
                         labels: [time],
                         datasets: [
                             {
                                 label: "Download",
                                 fill: false,
-                                backgroundColor:"red",
+                                backgroundColor: "red",
                                 borderColor: "red",
                                 data: [result.sizeDownload],
                                 yAxisId: "y"
@@ -268,8 +293,8 @@
                             {
                                 label: "Upload",
                                 fill: false,
-                                backgroundColor:"lightblue",
-                                borderColor:"lightblue",
+                                backgroundColor: "lightblue",
+                                borderColor: "lightblue",
                                 data: [result.sizeUpload],
                                 yAxisId: "y2"
                             }
@@ -278,8 +303,8 @@
                 });
             });
         }
-       
-        
+
+
 
         function monitorTorrents(view) {
             setTimeout(async () => {
@@ -292,31 +317,63 @@
                 //for (let i = 0; i <= paths.length-1; i++) {
                 //    paths[i].setAttribute('fill', "currentColor");
                 //} 
-                var current = new Date();
-                var time = current.toLocaleTimeString();
-                updateChartData(time, result);
+                //var current = new Date();
+                //var time = current.toLocaleTimeString();
+                //updateNetworkChartData(time, result);
 
-                for(let i = 0; i <= result.torrents.length-1; i++) {
-                    var row;
+                var style = getComputedStyle(document.body);
+                require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
+                    for (let i = 0; i <= result.torrents.length - 1; i++) {
+                        var row;
+                        var torrent = result.torrents[i];
+                        try {
 
-                    try {
-                        
-                        row = document.getElementById(result.torrents[i].Hash);
+                            row = document.getElementById(result.torrents[i].Hash);
 
-                    } catch(err) {
-                        console.log(err);
-                    }
-                    if (row) {
-                        if (result.torrents[i].Progress < 999) {
-                            
-                            //removeData();
-                            row.innerHTML = renderTableRowHtml(result.torrents[i], true);
-                        } else {
-                            row.innerHTML = '';
+                        } catch (err) {
+                            console.log(err);
                         }
-                       
+                        if (row) {
+                            if (torrent.Progress < 999) {
+                                //removeData();
+                                row.innerHTML = renderTableRowHtml(torrent, true);
+                                                                                  
+                                var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
+                                new Chart(progressCtx,
+                                    {
+                                        type: 'doughnut',
+                                        label: "Progress",
+                                        data: {
+                                            //labels  : [ 'Complete', 'Size' ],
+                                            datasets: [
+                                                {
+                                                    data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
+                                                    backgroundColor: [style.getPropertyValue("--theme-primary-color"), "transparent"],
+                                                    borderColor: ["black", style.getPropertyValue("--theme-primary-color")],
+                                                    borderWidth: 1,
+                                                    //dataFriendly   : [ driveData[t].FriendlyUsed, driveData[t].FriendlyAvailable ]
+                                                }
+                                            ]
+                                        },
+                                        options: {
+                                            cutoutPercentage: 50,
+                                            animation: {
+                                                animateRotate: false
+                                            }
+                                        }
+                                    });
+
+
+
+
+                            } else {
+                                row.innerHTML = '';
+                            }
+
+                        }
                     }
-                }
+
+                });
 
 
                 monitorTorrents(view);
@@ -340,7 +397,7 @@
                     }
 
                     var results;
-                    
+
                     try {
 
                         results = await getUTorrentData();
@@ -348,8 +405,8 @@
                     } catch (err) {
 
                     }
-                   
-                    if(results) await updatePageData(view, config, results);
+
+                    if (results) await updatePageData(view, config, results);
                     loaded = true;
                     monitorTorrents(view);
 
@@ -359,5 +416,5 @@
                     loaded = false;
                 });
         }
-        
+
     });

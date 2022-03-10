@@ -3,6 +3,7 @@
 
         var pluginId = "b1390c15-5b4f-4038-bb58-b71b9ef4211b";
         var loaded;
+        
         var pagination = {
             StartIndex      : 0,
             Limit           : 25,
@@ -177,20 +178,20 @@
             html += '<td data-title="File Name" class="detailTableBodyCell fileCell">' + torrent.Name + '</td>';
             html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
             html += '<td data-title="Speed" class="detailTableBodyCell fileCell">' + torrent.DownloadSpeedFriendly + '/s</td>';
-            html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
+            //html += '<td data-title="Progress" class="detailTableBodyCell fileCell">';
             
-            html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
-            html += '<canvas id="chart_' + torrent.Hash + '_progress" width="100" height="100" style="max-width:50px"></canvas>';
-            html += '</div>';
-            //html += '<div style="display:flex;align-items:center;">';
-            //html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
-            //html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
+            //html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
+            //html += '<canvas id="chart_' + torrent.Hash + '_progress" width="100" height="100" style="max-width:50px"></canvas>';
             //html += '</div>';
-            //html += '</div>';
-            //html += '</div>'; 
-            html += '</td>';
+            ////html += '<div style="display:flex;align-items:center;">';
+            ////html += '<div class="taskProgressOuter" title="' + (torrent.Progress / 10) + '%" style="flex-grow:1;">';
+            ////html += '<div class="taskProgressInner" style="width:' + (torrent.Progress / 10) + '%; height:0.3em; background-color: var(--theme-primary-color);">';
+            ////html += '</div>';
+            ////html += '</div>';
+            ////html += '</div>'; 
+            //html += '</td>';
             html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
-            html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
+            //html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">';
 
             //html += '<div style="display:flex;align-items:center;justify-content:center; height:5em">';
@@ -225,32 +226,29 @@
             torrents.forEach(async torrent => {
                 html += renderTableRowHtml(torrent, false);
 
-                require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
-                    var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
-                    
+                //require([Dashboard.getConfigurationResourceUrl('Chart.js')], (Chart) => {
+                //    var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
+                     
+                //   new Chart(progressCtx,
+                //        {
+                //            type: 'doughnut',
+                //            label: "Progress",
+                //            data: {
+                //                //labels  : [ 'Complete', 'Size' ],
+                //                datasets: [
+                //                    {
+                //                        data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
+                //                        backgroundColor: [style.getPropertyValue("--theme-primary-color"), "transparent"],
+                //                        borderColor: ["black", style.getPropertyValue("--theme-primary-color")],
+                //                        borderWidth: 1,
+                //                        //dataFriendly   : [ driveData[t].FriendlyUsed, driveData[t].FriendlyAvailable ]
+                //                    }
+                //                ]
+                //            },
+                //            options: { cutoutPercentage: 50 }
+                //        });
 
-                    new Chart(progressCtx,
-                        {
-                            type: 'doughnut',
-                            label: "Progress",
-                            data: {
-                                //labels  : [ 'Complete', 'Size' ],
-                                datasets: [
-                                    {
-                                        data: [torrent.Progress / 10, (100 - (torrent.Progress / 10))],
-                                        backgroundColor: [style.getPropertyValue("--theme-primary-color"), "transparent"],
-                                        borderColor: ["black", style.getPropertyValue("--theme-primary-color")],
-                                        borderWidth: 1,
-                                        //dataFriendly   : [ driveData[t].FriendlyUsed, driveData[t].FriendlyAvailable ]
-                                    }
-                                ]
-                            },
-                            options: { cutoutPercentage: 50 }
-                        });
-                });
-
-
-
+                //});
             });
             return html;
         }
@@ -269,7 +267,7 @@
         }
         
         async function getUTorrentData() {
-            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + '&SortBy=' + currentSort));
+            const result = await ApiClient.getJSON(ApiClient.getUrl("GetTorrentData?StartIndex=" + pagination.StartIndex + "&Limit=" + pagination.Limit + '&SortBy=' + currentSort + ''));
             return result;
         }
        
@@ -375,6 +373,7 @@
                     }
                     if (row) {
                         row.innerHTML = renderTableRowHtml(result.torrents[i], true);
+                        
                     }
                 }
                 monitorTorrents(view);

@@ -318,14 +318,22 @@ namespace uTorrent.Api
                         {
                             if (request.FilterDownloadingOnly.Value)
                             {
-                                var temp = new List<Torrent>();
-                                temp.AddRange(TorrentParser.ParseTorrentData(results.torrents)); //Add the new data to the master list
-                                torrents = temp.Where(t => Convert.ToInt32(t.Progress) < 1000).ToList();
+                                //Only downloading torrents
+                                //var temp = new List<Torrent>();
+                                torrents.Clear();
+                                torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents).Where(t => Convert.ToInt32(t.Progress) < 1000)); //Add the new data to the temp list
+                                //torrents = temp.Where(t => Convert.ToInt32(t.Progress) < 1000).ToList();
                             }
                         }
                         else
                         {
-                            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents)); //Add the new data to the master list
+                            //Only seeding torrents
+                            //var temp = new List<Torrent>();
+                            torrents.Clear();
+                            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents).Where(t => Convert.ToInt32(t.Progress) >= 1000)); //Add the new data to the temp list
+                           // torrents = temp.ToList();
+
+                            /*torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents)); *///Add the new data to the master list
                             //rssFeed.AddRange(TorrentParser.ParseTorrentRssFeed(results.rssfeeds));
                         }
 

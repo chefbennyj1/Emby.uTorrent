@@ -49,7 +49,7 @@ namespace uTorrent.Api
                 UploadSpeed           = (string)t[8],
                 DownloadSpeedFriendly = FileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[9])),
                 DownloadSpeed         = (string)t[9],
-                Eta                   = (Convert.ToInt32((string)t[10]) / 60) + " minute(s)",
+                Eta                   = CalculateEta(Convert.ToInt32((string)t[10])).ToString(),
                 Label                 = (string)t[11],
                 PeersConnected        = (string)t[12],
                 PeersInSwarm          = (string)t[13],
@@ -65,6 +65,13 @@ namespace uTorrent.Api
             return list.ToList();
         }
 
+        private static TimeSpan CalculateEta(int eta)
+        {
+            var minutes = eta / 60;
+            if (minutes < 0) return TimeSpan.Zero;
+            if (minutes > 100000) return TimeSpan.Zero;
+            return TimeSpan.FromMinutes(minutes);
+        }
         public static List<RssFeed> ParseTorrentRssFeed(List<object[]> obj)
         {
             var list = obj.Select(rss => new RssFeed()
