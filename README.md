@@ -3,6 +3,8 @@ Emby plugin to interface uTorrent data
 
 Use uTorrent 2.2.1
 
+![img](https://raw.githubusercontent.com/chefbennyj1/Emby.uTorrent/master/utorrent_img1.png)
+
 # Downloads Page
 >Show currently download items in uTorrent
 ![img](https://github.com/chefbennyj1/Emby.uTorrent/blob/master/utorrent_img_1.png)
