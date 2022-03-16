@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace uTorrent.Api
+namespace uTorrent.Core.Torrent
 {
-    public class UTorrentResponse
+    public class TorrentList
     {
         public int build                     { get; set; }
         public List<List<object>> label      { get; set; }

@@ -1,5 +1,6 @@
-﻿//{"build":25249,"settings": [
-//["torrents_start_stopped",1,"false"]
+﻿//{
+//    "build":25249,"settings": [
+//   ["torrents_start_stopped",1,"false"]
 //,["confirm_when_deleting",1,"true"]
 //,["install_revision",0,"25249"]
 //,["settings_saved_systime",0,"1606822200"]
@@ -306,4 +307,35 @@
 //,["proxy.username",2,""]
 //,["proxy.password",2,""]
 //]
+//}
+
+//async function getImage(name, type)
+//{
+//    //return new Promise((resolve, reject) => {
+//    var options = {
+//        SearchInfo: {
+//    Name: name
+//        }
+//    }
+
+//    var url = ApiClient._serverAddress +
+//              '/emby/' +
+//              'Items/RemoteSearch/' +
+//              type +
+//              '?api_key=' +
+//              ApiClient._serverInfo.AccessToken;
+//const rawResponse = await fetch(url, {
+
+//    method: 'POST',
+//    headers: {
+
+//        'Accept': 'application/json',
+//            'Content-Type': 'application/json'
+//        },
+//        body: JSON.stringify(options)
+//    });
+//const content = await rawResponse.json();
+
+//console.log(content[0]);
+//return content[0];
 //}

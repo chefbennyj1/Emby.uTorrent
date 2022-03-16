@@ -8,6 +8,8 @@ namespace uTorrent.Configuration
         public int port                         { get; set; }
         public string userName                  { get; set; }
         public string password                  { get; set; }
-        public string FinishedDownloadsLocation { get; set; }
+        public string FinishedDownloadsLocation { get; set; } = "";
+        public string EmbyAutoOrganizeFolderPath { get; set; } = "";
+        public bool EnableTorrentUnpacking { get; set; } = false;
     }
 }

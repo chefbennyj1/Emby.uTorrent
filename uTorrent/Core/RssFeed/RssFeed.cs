@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace uTorrent.Api
+namespace uTorrent.Core.RssFeed
 {
     public class RssFeed
     {

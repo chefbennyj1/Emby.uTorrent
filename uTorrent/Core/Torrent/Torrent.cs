@@ -1,10 +1,10 @@
 ﻿#nullable enable
-namespace uTorrent.Api 
+namespace uTorrent.Core.Torrent 
 {
     public enum MediaType
     {
         MOVIE,
-        TV_SHOW,
+        SERIES,
         UNKNOWN
     }
     public class Torrent
@@ -56,6 +56,11 @@ namespace uTorrent.Api
         public string? Path                  { get; set; }
 
         public string? AddedDate             { get; set; }
+
+        public string? FileName { get; set; }
+
+        public string? Extension { get; set; }
+       
     }
 
     public class MediaInfo
@@ -65,6 +70,7 @@ namespace uTorrent.Api
         public int? Episode { get; set; }
         public MediaType MediaType { get; set; } = MediaType.UNKNOWN;
         public string Resolution { get; set; }
+        public int Year { get; set; } = 0;
 
     }
 }

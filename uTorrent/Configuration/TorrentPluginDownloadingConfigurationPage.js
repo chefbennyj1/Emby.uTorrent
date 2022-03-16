@@ -27,6 +27,10 @@
                 {
                     href: Dashboard.getConfigurationPageUrl('TorrentPluginUploadConfigurationPage'),
                     name: "Upload"
+                },
+                {
+                    href: Dashboard.getConfigurationPageUrl('TorrentPluginPostProcessingConfigurationPage'),
+                    name: "Post Processing"
                 }
             ];
         }
@@ -97,6 +101,7 @@
             html += '</td>';
 
             html += '<td data-title="Name" class="detailTableBodyCell fileCell">' + torrent.Name + '</td>';
+           // html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Extension + '</td>';
             html += '<td data-title="Size" class="detailTableBodyCell fileCell">' + torrent.Size + '</td>';
             html += '<td data-title="Speed" class="detailTableBodyCell fileCell">' + torrent.DownloadSpeedFriendly + '/s</td>';
 
@@ -113,6 +118,7 @@
             html += '</td>';
             html += '<td data-title="Complete" class="detailTableBodyCell fileCell"><span>' + (torrent.Progress / 10) + '%</span></td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
+            html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.SeedsConnected) + '</td>';
             //html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
             html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
             html += '<button id="btn_' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';

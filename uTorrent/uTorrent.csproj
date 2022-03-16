@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 <PropertyGroup> <TargetFrameworks>netstandard2.0;</TargetFrameworks> <AssemblyVersion>1.0.0.0</AssemblyVersion> <FileVersion>1.0.0.0</FileVersion> <Version>1.0.0.0</Version> <LangVersion>8</LangVersion> </PropertyGroup>
 
@@ -14,6 +14,8 @@
   <None Remove="Configuration\Chart.js" />
   <None Remove="Configuration\TorrentPluginDownloadingConfigurationPage.html" />
   <None Remove="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginPostProcessingConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginPostProcessingConfigurationPage.js" />
   <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.html" />
   <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.js" />
   <None Remove="Configuration\TorrentPluginSettingsConfigurationPage.html" />
@@ -27,6 +29,8 @@
   <EmbeddedResource Include="Configuration\Chart.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginDownloadingConfigurationPage.html" />
   <EmbeddedResource Include="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginPostProcessingConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginPostProcessingConfigurationPage.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.html" />
   <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginSettingsConfigurationPage.html" />
@@ -36,6 +40,10 @@
   <EmbeddedResource Include="thumb.jpg" />
 </ItemGroup>
 
-<ItemGroup> <PackageReference Include="mediabrowser.server.core" Version="4.3.0.30" /> <PackageReference Include="System.Memory" Version="4.5.4" /></ItemGroup>
+<ItemGroup>
+   <PackageReference Include="mediabrowser.server.core" Version="4.3.0.30" /> 
+   <PackageReference Include="System.Memory" Version="4.5.4" />
+   <PackageReference Include="sharpcompress" Version="0.24.0" />
+</ItemGroup>
 
 </Project>

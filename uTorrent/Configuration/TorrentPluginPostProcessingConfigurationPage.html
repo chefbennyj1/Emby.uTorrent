@@ -1,0 +1,50 @@
+﻿<div data-role="page" style="align-items: center; margin: auto;" class="type-interior pluginConfigurationPage withTabs  TorrentPluginConfigurationPage" data-require="emby-button,emby-input,emby-select,emby-toggle" data-controller="__plugin/TorrentPluginPostProcessingConfigurationPageJS">
+    <div class="content-primary">
+        <div class="verticalSection verticalSection">
+            <div class="sectionTitleContainer sectionTitleContainer-cards align-items-center">
+                <br />
+                <div class="pagingContainer">
+                    <form>
+
+                        <div class="inputContainer">
+                            <label for="finishedDownloadLocation">Finished Download Location</label>
+                            <input id="finishedDownloadLocation" name="finishedDownloadLocation" class="emby-input" />
+                            <div class="fieldDescription">
+                                Specify the location uTorrent will move complete files too (Also found in uTorrent: Options > Preferences > Directories. <br />
+                                Use UNC paths when uTorrent is on another machine, so Emby can access this folder.
+                            </div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label for="autoOrganizeMonitoredFolderLocation">Auto Organize Monitored Folder Location</label>
+                            <input id="autoOrganizeMonitoredFolderLocation" name="autoOrganizeMonitoredFolderLocation" class="emby-input" />
+                            <div class="fieldDescription">
+                                Specify the location of Emby's Auto Organize, Monitored folder.
+                            </div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label style="width: auto;" class="mdl-switch mdl-js-switch">
+                                <input is="emby-toggle" type="checkbox" id="enableTorrentUnpacking" class="chkEnableTorrentUnpacking" data-embytoggle="">
+                                <span class="toggleButtonLabel mdl-switch__label">Unpack, or copy files into Emby's Auto organize folders, when torrent is complete.</span>
+                                <div class="mdl-switch__trackContainer">
+                                    <div class="mdl-switch__track"></div>
+                                    <div class="mdl-switch__thumb">
+                                        <span class="mdl-switch__focus-helper"></span>
+                                    </div>
+                                </div>
+                            </label>
+                            <div class="fieldDescription">
+                                Copy files in Emby's Auto Organize monitored folder for sorting. When a file is compressed, unzip the file and copy. When a file is not compressed, copy it.
+                            </div>
+                        </div>
+
+
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

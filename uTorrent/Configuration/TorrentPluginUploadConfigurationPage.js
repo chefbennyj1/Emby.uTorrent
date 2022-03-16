@@ -20,6 +20,10 @@
                 {
                     href: Dashboard.getConfigurationPageUrl('TorrentPluginUploadConfigurationPage'),
                     name: "Upload"
+                },
+                {
+                    href: Dashboard.getConfigurationPageUrl('TorrentPluginPostProcessingConfigurationPage'),
+                    name: "Post Processing"
                 }
             ];
         }

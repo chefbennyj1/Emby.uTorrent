@@ -20,6 +20,10 @@
                 {
                     href: Dashboard.getConfigurationPageUrl('TorrentPluginUploadConfigurationPage'),
                     name: "Upload"
+                },
+                {
+                    href: Dashboard.getConfigurationPageUrl('TorrentPluginPostProcessingConfigurationPage'),
+                    name: "Post Processing"
                 }
             ];
         }
@@ -136,15 +140,6 @@
                                 console.log("seed_ratio " + e.target.value);
                                 console.log(result.status);
                             });
-
-                        //ApiClient._webSocket.addEventListener('message',
-                        //    function(message) {
-                        //        var json = JSON.parse(message.data);
-                        //        if (json.MessageType === "TorrentUpdate") {
-                        //            //updateTorrentResultTable(view, config, json);
-                        //            console.log(json.Data);
-                        //        }
-                        //    }); 
                     }
 
 
@@ -160,7 +155,6 @@
                             console.log(r.status);
                             var updateResult = await ApiClient.updatePluginConfiguration(pluginId, config);
                             Dashboard.processPluginConfigurationUpdateResult(updateResult);
-
                         });
             });
 
