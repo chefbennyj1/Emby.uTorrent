@@ -120,8 +120,29 @@
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.Eta) + '</td>';
             html += '<td data-title="Eta" class="detailTableBodyCell fileCell">' + (torrent.SeedsConnected) + '</td>';
             //html += '<td data-title="Date Added" class="detailTableBodyCell fileCell">' + torrent.AddedDate + '</td>';
-            html += '<td data-title="Remove" class="detailTableBodyCell fileCell">';
-            html += '<button id="btn_' + torrent.Hash + '" class="fab removeTorrent emby-button"><i class="md-icon">clear</i></button>';
+            html += '<td data-title="Action" class="detailTableBodyCell fileCell">';
+            html += '<div style="display:flex">';
+            
+            //Remove
+            html += '<button id="btn_remove_' + torrent.Hash + '" class="fab actionBtn removeTorrent emby-button">';
+            html += '<svg style="width:24px;height:24px" viewBox = "0 0 24 24" >';
+            html += '<path fill="var(--theme-primary-color)" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />';
+            html += '</button>';
+            
+            //Pause
+            html += '<button id="btn_pause_' + torrent.Hash + '" class="fab actionBtn pauseTorrent emby-button hide">';
+            html += '<svg style="width:24px;height:24px" viewBox = "0 0 24 24" >';
+            html += '<path fill="var(--theme-primary-color)" d="M14,19H18V5H14M6,19H10V5H6V19Z" />';
+            html += '</button>';
+
+            //Start
+            html += '<button id="btn_start_' + torrent.Hash + '" class="fab actionBtn startTorrent emby-button">';
+            html += '<svg style="width:24px;height:24px" viewBox = "0 0 24 24" >';
+            html += '<path fill="var(--theme-primary-color)" d="M8,5.14V19.14L19,12.14L8,5.14Z"  />';
+            html += '</button>';
+            
+
+            html += '</div>';
             html += '</td>';
 
             html += '<td class="detailTableBodyCell organizerButtonCell" style="whitespace:no-wrap;"></td>';
@@ -170,12 +191,18 @@
             return result;
         }
 
-        function removeTorrent(hash, config) {
-            return new Promise((resolve, reject) => {
-                ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash)).then((result) => {
-                    resolve(result);
-                });
-            });
+        //Controls
+        async function removeTorrent(hash) {
+            const result = ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash));
+            console.log(result);
+        }
+        async function stopTorrent(hash) {
+            const result = ApiClient.getJSON(ApiClient.getUrl("StopTorrent?Id=" + hash));
+            console.log(result);
+        }
+        async function startTorrent(hash) {
+            const result = ApiClient.getJSON(ApiClient.getUrl("StartTorrent?Id=" + hash));
+            console.log(result);
         }
 
         async function getUTorrentData() {
@@ -183,25 +210,7 @@
             return result;
         }
 
-        function remoteControlTorrent(remoteCommand, id, config) {
-            return new Promise((resolve, reject) => {
-                ApiClient.getJSON(ApiClient.getUrl(
-                    remoteCommand +
-                    "?IpAddress=" +
-                    config.ipAddress +
-                    "&Port=" +
-                    config.port +
-                    "&UserName=" +
-                    encodeURIComponent(config.userName) +
-                    "&Password=" +
-                    encodeURIComponent(config.password) +
-                    "&Id=" +
-                    id)).then((response) => {
-                        resolve(response.status);
-                    });
-            });
-        }
-
+        
         async function updatePageData(view, config, results) {
 
             const pagingContainer = view.querySelector('.pagingContainer');
@@ -238,15 +247,28 @@
 
             Dashboard.hideLoadingMsg();
 
-            view.querySelectorAll('.removeTorrent').forEach(removeTorrentButton => {
-                removeTorrentButton.addEventListener('click',
-                    (e) => {
+            view.querySelectorAll('.actionBtn').forEach(actionButton => {
+                actionButton.addEventListener('click',
+                    async (e) => {
+
                         var tableRow = e.target.closest('tr');
-                        tableRow.querySelector('.taskProgressInner').style = "background-color:yellow";
-                        tableRow.disabled = true;
-                        removeTorrent(e.target.closest('button').id, config).then(result => {
+                        var btn = e.target.closest('button');
+
+                        var torrentHash = btn.idsplit('_', '')[1];
+
+                        if (btn.classList.contains('removeTorrent')) {
+                            let result = await removeTorrent(torrentHash);
                             console.log(result.status);
-                        });
+                        }
+                        if (btn.classList.contains('stopTorrent')) {
+                            let result = await stopTorrent(torrentHash);
+                            console.log(result.status);
+                        }
+                        if (btn.classList.contains('startTorrent')) {
+                            let result = await startTorrent(torrentHash);
+                            console.log(result.status);
+                        }
+                        
                     });
             });
 

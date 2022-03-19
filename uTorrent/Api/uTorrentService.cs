@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
+using System.Web;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using MediaBrowser.Model.Logging;
@@ -38,10 +36,6 @@ namespace uTorrent.Api
         [Route("/StopTorrent", "GET", Summary = "Start Torrent End Point")]
         public class StopTorrent : IReturn<string>
         {
-            [ApiMember(Name = "Token", Description = "Token", IsRequired = true, DataType = "string",
-                ParameterType = "query", Verb = "GET")]
-            public string Token { get; set; }
-
             [ApiMember(Name = "Id", Description = "Hash", IsRequired = true, DataType = "string",
                 ParameterType = "query", Verb = "GET")]
             public string Id { get; set; }
@@ -134,60 +128,75 @@ namespace uTorrent.Api
         private string cache => "&cid=";
         private string getSettings => "&action=getsettings";
         private string setSettings => "&action=setsetting";
-       
-
-        public static UTorrentService Instance { get; set; }
+        private string remove => "&action=remove&hash=";
+        private string start => "&action=start&hash=";
+        private string stop => "&action=stop&hash=";
         public UTorrentService(IJsonSerializer json, ILogManager logMan, ISessionManager ses, ILibraryManager libraryManager)
         {
             JsonSerializer = json;
             Log = logMan.GetLogger(Plugin.Instance.Name);
             SessionManager = ses;
             LibraryManager = libraryManager;
-            Instance = this;
+           
         }
 
         // ReSharper disable MethodNameNotMeaningful
-        //public string Get(RemoveTorrent request)
-        //{
-        //    HttpWebResponse response = null;
-        //    try
-        //    {
-        //        const string endpoint = "&action=removedata&hash=";
-        //        var config = Plugin.Instance.Configuration;
-        //        if (config.userName is null)
-        //        {
-        //            return JsonSerializer.SerializeToString(new StatusResponse()
-        //            {
-        //                status = "No configuration present"
-        //            });
-        //        }
-        //        var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{Token()}{endpoint}{request.Id}";
+        public string Get(RemoveTorrent request)
+        {
+            try
+            {
+                var config = Plugin.Instance.Configuration;
+                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{GetRequestToken()}{remove}{request.Id}";
+                var result = TorrentClient.Instance.Get<object>(url, "application/json");
+                return result.ToString();
 
-        //        var client = new TorrentClient();
-        //        try
-        //        {
-        //            response = client.Get(url, "application/x-www-form-urlencoded");
-        //        }
-        //        catch
-        //        {
-        //            Log.Warn("Make sure username and Password are correct");
-        //        }
+            }
+            catch (Exception ex)
+            {
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                {
+                    status = ex.Message
+                });
+            }
+        }
 
+        public string Get(StartTorrent request)
+        {
+            try
+            {
+                var config = Plugin.Instance.Configuration;
+                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{GetRequestToken()}{start}{request.Id}";
+                var result = TorrentClient.Instance.Get<object>(url, "application/json");
+                return result.ToString();
 
-        //        return JsonSerializer.SerializeToString(new StatusResponse()
-        //        {
-        //            status = response?.StatusCode.ToString()
-        //        });
+            }
+            catch (Exception ex)
+            {
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                {
+                    status = ex.Message
+                });
+            }
+        }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return JsonSerializer.SerializeToString(new StatusResponse()
-        //        {
-        //            status = ex.Message
-        //        });
-        //    }
-        //}
+        public string Get(StopTorrent request)
+        {
+            try
+            {
+                var config = Plugin.Instance.Configuration;
+                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{GetRequestToken()}{stop}{request.Id}";
+                var result = TorrentClient.Instance.Get<object>(url, "application/json");
+                return result.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                return JsonSerializer.SerializeToString(new StatusResponse()
+                {
+                    status = ex.Message
+                });
+            }
+        }
 
         public string Get(SetSettings request)
         {
@@ -236,7 +245,11 @@ namespace uTorrent.Api
 
             CacheId = results.torrentc;
 
-            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrentp));
+            var settings = TorrentClient.Instance.Get<Settings>(
+                $"http://{config.ipAddress}:{config.port}{gui}{token}{requestToken}{getSettings}",
+                "application/json");
+
+            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrentp, settings));
             var totalDownloadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32((string)t.DownloadSpeed))).Split(' ');
             var totalUploadRate = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
             var totalRecordCount = torrents.Count;
@@ -265,9 +278,13 @@ namespace uTorrent.Api
             }
             var requestToken = GetRequestToken();
             var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{requestToken}{list}";
+            
             var results = TorrentClient.Instance.Get<TorrentList>(url, "application/json");
+
             CacheId = results.torrentc;
 
+            var settings = TorrentClient.Instance.Get<Settings>($"http://{config.ipAddress}:{config.port}{gui}{token}{requestToken}{getSettings}", "application/json");
+            
             if (request.FilterDownloadingOnly.HasValue)
             {
                 if (request.FilterDownloadingOnly.Value)
@@ -275,8 +292,8 @@ namespace uTorrent.Api
                     //Only downloading torrents
                     //var temp = new List<Torrent>();
                     torrents.Clear();
-                    torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents).Where(t => Convert.ToInt32(t.Progress) < 1000)); //Add the new data to the temp list
-                                                                                                                                        //torrents = temp.Where(t => Convert.ToInt32(t.Progress) < 1000).ToList();
+                    torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, settings).Where(t => Convert.ToInt32(t.Progress) < 1000)); //Add the new data to the temp list
+                                                                                                                                        
                 }
             }
             else
@@ -284,11 +301,8 @@ namespace uTorrent.Api
                 //Only seeding torrents
                 //var temp = new List<Torrent>();
                 torrents.Clear();
-                torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents).Where(t => Convert.ToInt32(t.Progress) >= 1000)); //Add the new data to the temp list
-                                                                                                                                     // torrents = temp.ToList();
+                torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, settings).Where(t => Convert.ToInt32(t.Progress) >= 1000)); //Add the new data to the temp list
 
-                /*torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents)); *///Add the new data to the master list
-                                                                                         //rssFeed.AddRange(TorrentParser.ParseTorrentRssFeed(results.rssfeeds));
             }
 
             if (request.SortBy.HasValue)
@@ -333,13 +347,13 @@ namespace uTorrent.Api
             return JsonSerializer.SerializeToString(new TorrentData()
             {
                 //RssFeeds = rssFeed,
-                torrents = torrentChunk,
-                TotalRecordCount = totalRecordCount,
-                sizeDownload = totalDownloadRate[0],
-                sizeSuffixDownload = totalDownloadRate[1],
-                sizeUpload = totalUploadRate[0],
-                sizeSuffixUpload = totalUploadRate[1],
-                sizeTotalDriveSpace = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt64(t.TotalBytes))),
+                torrents                 = torrentChunk,
+                TotalRecordCount         = totalRecordCount,
+                sizeDownload             = totalDownloadRate[0],
+                sizeSuffixDownload       = totalDownloadRate[1],
+                sizeUpload               = totalUploadRate[0],
+                sizeSuffixUpload         = totalUploadRate[1],
+                sizeTotalDriveSpace      = FileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt64(t.TotalBytes))),
                 sizeTotalDriveSpaceBytes = torrents.Sum(t => Convert.ToInt64(t.TotalBytes)).ToString()
             });
         }
@@ -364,15 +378,13 @@ namespace uTorrent.Api
             try
             {
                 const string endpoint = "&action=add-url&s=";
-                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{GetRequestToken()}{endpoint}{request.Url}";
+                var url = $"http://{config.ipAddress}:{config.port}{gui}{token}{GetRequestToken()}{endpoint}{HttpUtility.UrlDecode(request.Url)}";
                 TorrentClient.Instance.Get<object>(url, "application/json");
                 return JsonSerializer.SerializeToString(new StatusResponse() { status = "OK" });
-
             }
             catch (Exception ex)
             {
-                return JsonSerializer.SerializeToString(new StatusResponse()
-                { status = ex.Message });
+                return JsonSerializer.SerializeToString(new StatusResponse() { status = ex.Message });
             }
         }
 

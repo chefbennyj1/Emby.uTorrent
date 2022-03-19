@@ -63,7 +63,7 @@
                         const settings = result.settings;
                         inputFinishedDownloadLocation.value = settings[22][2];
                         inputAutoOrganizeFolder.value = config.EmbyAutoOrganizeFolderPath;
-                        enableTorrentUnpacking.value = config.EnableTorrentUnpacking;
+                        enableTorrentUnpacking.checked = config.EnableTorrentUnpacking || false;
                     }
 
                     enableTorrentUnpacking.addEventListener('change', async () => {

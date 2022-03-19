@@ -33,7 +33,9 @@
             return this.ajax({
                 type: "POST",
                 url: url,
-                data: JSON.stringify({Url:uploadUrl}),
+                data: JSON.stringify({
+                    Url:encodeURIComponent(uploadUrl)
+                }),
                 contentType: 'application/json'
             });
         };
@@ -42,23 +44,23 @@
             return await ApiClient.uploadTorrentUrl(url);
         }
 
-       
-
         return function (view) {
             view.addEventListener('viewshow', async () => {
 
                 mainTabsManager.setTabs(this, 3, getTabs);
-                
-                
 
                 var btnUpload = view.querySelector('#uploadButton');
 
                 btnUpload.addEventListener('click', async (e) => {
+                    loading.show();
                     e.preventDefault();
-                    var url = view.querySelector('#torrentUrl').value;
-                    await uploadTorrentUrl(url);
+                    var inputUploadUrl = view.querySelector('#torrentUrl');
+                    var url = inputUploadUrl.value;
+                    var uploaded =  await uploadTorrentUrl(url);
+                    Dashboard.processPluginConfigurationUpdateResult("TorrentAdded: " + uploaded);
+                    inputUploadUrl.value = "";
+                    loading.hide();
                 });
-
             });
 
         }

@@ -4,15 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using uTorrent.Helpers;
-
+using uTorrent.Core.Settings;
 namespace uTorrent.Core.Torrent
 {
     public class TorrentParser
     {
-        public static List<Torrent> ParseTorrentData(List<object[]> obj)
+        public static List<Torrent> ParseTorrentData(List<object[]> obj, Settings.Settings settings)
         {
-            var config = Plugin.Instance.Configuration;
-            var dir    = config.FinishedDownloadsLocation ?? string.Empty;
+            var dir    = (string) settings.settings[22][2];
 
             // ReSharper disable once ComplexConditionExpression
             var list = obj.Select(t => new Torrent
@@ -46,10 +45,6 @@ namespace uTorrent.Core.Torrent
             return list.ToList();
         }
 
-        private static string GetFileExtension(string fileName)
-        {
-            return new FileInfo(fileName).Extension;
-        }
         
         private static string ParseStatus(int status, int progress)
         {
@@ -112,7 +107,7 @@ namespace uTorrent.Core.Torrent
         {
             
             var regexDate = new Regex(@"\b(19|20|21)\d{2}\b");
-            var regexTvShow = new Regex(@"(.*?)\.S?(\d{1,2})E?(\d{2})\.(.*)", RegexOptions.IgnoreCase);
+            var regexTvShow = new Regex(@"(.*?)\.[Ss](\d{1,2})[Ee](\d{2})\.(.*)", RegexOptions.IgnoreCase);
             
             var dateMatch = regexDate.Match(fileName);
             if (dateMatch.Success)

@@ -103,7 +103,7 @@
                             activeTorrents.value = settingsActiveTorrentsCount[2];
                             seedRatio.value = settingsSeedRatio[2];
 
-                            view.querySelector('#finishedDownloadLocation').value = settings[22][2];
+                            //view.querySelector('#finishedDownloadLocation').value = settings[22][2];
                         }
 
                         view.querySelector('#selectMaxUpload').addEventListener('change',
@@ -150,9 +150,9 @@
                             config.password                  = view.querySelector('#pass').value;
                             config.ipAddress                 = view.querySelector('#ip').value;
                             config.port                      = view.querySelector('#port').value;
-                            config.FinishedDownloadsLocation = view.querySelector('#finishedDownloadLocation').value;
-                            var r = await setSettings("dir_completed_download", view.querySelector('#finishedDownloadLocation').value);
-                            console.log(r.status);
+                            //config.FinishedDownloadsLocation = view.querySelector('#finishedDownloadLocation').value;
+                            //var r = await setSettings("dir_completed_download", view.querySelector('#finishedDownloadLocation').value);
+                            //console.log(r.status);
                             var updateResult = await ApiClient.updatePluginConfiguration(pluginId, config);
                             Dashboard.processPluginConfigurationUpdateResult(updateResult);
                         });

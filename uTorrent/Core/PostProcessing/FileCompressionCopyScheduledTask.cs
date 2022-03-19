@@ -109,7 +109,7 @@ namespace uTorrent.Core.PostProcessing
             };
         }
 
-        public string Name        => "Unpack torrent media files";
+        public string Name        => "Unpack media files";
         public string Description => "Unzip or Copy new files available in the configured watch folder into Emby's Auto Organize folder.";
         public string Category    => "Library";
         public string Key         => "FileCompressionCopy";
