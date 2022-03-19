@@ -129,18 +129,16 @@
             html += '<path fill="var(--theme-primary-color)" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />';
             html += '</button>';
             
-            //Pause
-            html += '<button id="btn_pause_' + torrent.Hash + '" class="fab actionBtn pauseTorrent emby-button hide">';
+            
+            //Stop = "M18,18H6V6H18V18Z"
+            //Start =  "M8,5.14V19.14L19,12.14L8,5.14Z" 
+            
+            //Action Button
+            html += '<button id="btn_action_' + torrent.Hash + '" class="fab actionBtn emby-button " data-state="' +torrent.Status + '">';
             html += '<svg style="width:24px;height:24px" viewBox = "0 0 24 24" >';
-            html += '<path fill="var(--theme-primary-color)" d="M14,19H18V5H14M6,19H10V5H6V19Z" />';
+            html += '<path fill="var(--theme-primary-color)" d=" ' + (torrent.Status == 'started' ? 'M18,18H6V6H18V18Z' : 'M8,5.14V19.14L19,12.14L8,5.14Z') + '" />';     //If any other state but "started" show "start" else show "stop".
             html += '</button>';
 
-            //Start
-            html += '<button id="btn_start_' + torrent.Hash + '" class="fab actionBtn startTorrent emby-button">';
-            html += '<svg style="width:24px;height:24px" viewBox = "0 0 24 24" >';
-            html += '<path fill="var(--theme-primary-color)" d="M8,5.14V19.14L19,12.14L8,5.14Z"  />';
-            html += '</button>';
-            
 
             html += '</div>';
             html += '</td>';
@@ -193,16 +191,21 @@
 
         //Controls
         async function removeTorrent(hash) {
-            const result = ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash));
-            console.log(result);
+            try {
+                await ApiClient.getJSON(ApiClient.getUrl("RemoveTorrent?Id=" + hash));
+            } catch (err){}
+
         }
         async function stopTorrent(hash) {
-            const result = ApiClient.getJSON(ApiClient.getUrl("StopTorrent?Id=" + hash));
-            console.log(result);
+            try {
+                await ApiClient.getJSON(ApiClient.getUrl("StopTorrent?Id=" + hash));
+            } catch (err) { }
         }
         async function startTorrent(hash) {
-            const result = ApiClient.getJSON(ApiClient.getUrl("StartTorrent?Id=" + hash));
-            console.log(result);
+            try {
+                await ApiClient.getJSON(ApiClient.getUrl("StartTorrent?Id=" + hash));
+            } catch (err) { }
+            
         }
 
         async function getUTorrentData() {
@@ -241,39 +244,28 @@
 
             view.querySelector('.torrentResultBody').innerHTML = getTorrentResultTableHtml(results.torrents, view);
 
+            for (let i = 0; i < results.torrents.length; i++) {
+                let row;
+                try {
 
+                    row = document.getElementById(results.torrents[i].Hash);
 
-            //renderNetworkChart(results, view);
+                } catch (err) {
+                    console.log(err);
+                }
+                if (row) {
+                    actionButtonsOnClick(row);
+                }
+            }
+            
+
 
             Dashboard.hideLoadingMsg();
 
-            view.querySelectorAll('.actionBtn').forEach(actionButton => {
-                actionButton.addEventListener('click',
-                    async (e) => {
-
-                        var tableRow = e.target.closest('tr');
-                        var btn = e.target.closest('button');
-
-                        var torrentHash = btn.idsplit('_', '')[1];
-
-                        if (btn.classList.contains('removeTorrent')) {
-                            let result = await removeTorrent(torrentHash);
-                            console.log(result.status);
-                        }
-                        if (btn.classList.contains('stopTorrent')) {
-                            let result = await stopTorrent(torrentHash);
-                            console.log(result.status);
-                        }
-                        if (btn.classList.contains('startTorrent')) {
-                            let result = await startTorrent(torrentHash);
-                            console.log(result.status);
-                        }
-                        
-                    });
-            });
+            
 
         }
-
+                      
         var downloadChart;
 
         function updateNetworkChartData(label, data) {
@@ -291,8 +283,6 @@
 
                 });
             }
-
-
 
             downloadChart.update();
         }
@@ -332,7 +322,29 @@
             });
         }
 
+        function actionButtonsOnClick(row) {
+            row.querySelectorAll('.actionBtn').forEach(btn => {
+                btn.addEventListener('click',
+                    async (e) => {
+                        var buttonElement = e.target.closest('button');
+                        var hash = buttonElement.id.split('_')[2];
+                        var state = buttonElement.dataset.state;
+                        if (state != 'started') {
+                            await startTorrent(hash);
+                            buttonElement.dataset.state = 'started';
+                            buttonElement.querySelector('path').setAttribute('d', 'M18,18H6V6H18V18Z'); //Stop Icon
+                            return;
+                        }
+                        if (state == 'started') {
+                            await stopTorrent(hash);
+                            buttonElement.dataset.state = 'stopped';
+                            buttonElement.querySelector('path').setAttribute('d', 'M8,5.14V19.14L19,12.14L8,5.14Z');
+                            return;
+                        }
 
+                    });
+            });
+        }
 
         function monitorTorrents(view) {
             setTimeout(async () => {
@@ -365,7 +377,7 @@
                             if (torrent.Progress < 999) {
                                 //removeData();
                                 row.innerHTML = renderTableRowHtml(torrent, true);
-                                                                                  
+                                actionButtonsOnClick(row);                                                  
                                 var progressCtx = view.querySelector('#chart_' + torrent.Hash + '_progress').getContext("2d");
                                 new Chart(progressCtx,
                                     {
@@ -390,10 +402,6 @@
                                             }
                                         }
                                     });
-
-
-
-
                             } else {
                                 row.innerHTML = '';
                             }
@@ -402,13 +410,19 @@
                     }
 
                 });
+                
+
+                
 
 
                 monitorTorrents(view);
 
+
+
             }, 5000);
         }
 
+        
         return function (view) {
             view.addEventListener('viewshow',
                 async () => {
@@ -439,6 +453,7 @@
                     monitorTorrents(view);
 
                 });
+
             view.addEventListener('viewhide',
                 () => {
                     loaded = false;
