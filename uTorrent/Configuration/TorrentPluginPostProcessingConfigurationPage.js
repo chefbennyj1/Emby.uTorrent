@@ -24,7 +24,11 @@
                 {
                     href: Dashboard.getConfigurationPageUrl('TorrentPluginPostProcessingConfigurationPage'),
                     name: "Post Processing"
-                }
+                },
+                //{
+                //    href: Dashboard.getConfigurationPageUrl('TorrentPluginRssConfigurationPage'),
+                //    name: "Rss"
+                //}
             ];
         }
 
@@ -49,22 +53,22 @@
 
                     var enableTorrentUnpacking = view.querySelector('#enableTorrentUnpacking');
 
-                    var result;
+                    //var result;
                         
-                    try {
-                        result = await getSettings();
-                    } catch(err) {
+                    //try {
+                    //    result = await getSettings();
+                    //} catch(err) {
 
-                        console.log("Make sure user name and password are correct.");
+                    //    console.log("Make sure user name and password are correct.");
 
-                    }
+                    //}
 
-                    if (result) {
-                        const settings = result.settings;
-                        inputFinishedDownloadLocation.value = settings[22][2];
-                        inputAutoOrganizeFolder.value = config.EmbyAutoOrganizeFolderPath;
-                        enableTorrentUnpacking.checked = config.EnableTorrentUnpacking || false;
-                    }
+                    //if (result) {
+                        //const settings = result.settings;
+                    inputFinishedDownloadLocation.value = config.FinishedDownloadsLocation;
+                    inputAutoOrganizeFolder.value       = config.EmbyAutoOrganizeFolderPath;
+                    enableTorrentUnpacking.checked      = config.EnableTorrentUnpacking || false;
+                    //}
 
                     enableTorrentUnpacking.addEventListener('change', async () => {
                         config.EnableTorrentUnpacking = enableTorrentUnpacking.checked;
@@ -74,6 +78,12 @@
 
                     inputAutoOrganizeFolder.addEventListener('input', async () => {
                         config.EmbyAutoOrganizeFolderPath = inputAutoOrganizeFolder.value;
+                        var updateResult = await ApiClient.updatePluginConfiguration(pluginId, config);
+                        Dashboard.processPluginConfigurationUpdateResult(updateResult);
+                    });
+
+                    inputFinishedDownloadLocation.addEventListener('input', async () => {
+                        config.FinishedDownloadsLocation = inputFinishedDownloadLocation.value;
                         var updateResult = await ApiClient.updatePluginConfiguration(pluginId, config);
                         Dashboard.processPluginConfigurationUpdateResult(updateResult);
                     });

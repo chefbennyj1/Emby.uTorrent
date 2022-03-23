@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uTorrent.Core.RssFeed
+namespace uTorrent.Core.uTorrent.Rss
 {
-    public class RssFeedParser
+    public class uTorrentRssFeedParser
     {
-        public static List<RssFeed> ParseTorrentRssFeed(List<object[]> obj)
+        public static List<UTorrentRssFeed> ParseTorrentRssFeed(List<object[]> obj)
         {
-            var list = obj.Select(rss => new RssFeed
+            var list = obj.Select(rss => new UTorrentRssFeed
             {
                 FeedId = (string)rss[0],
                 Enabled = (string)rss[1],

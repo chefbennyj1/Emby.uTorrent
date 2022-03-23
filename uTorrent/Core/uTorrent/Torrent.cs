@@ -1,12 +1,8 @@
-﻿#nullable enable
-namespace uTorrent.Core.Torrent 
+﻿using uTorrent.Utils;
+
+#nullable enable
+namespace uTorrent.Core.uTorrent 
 {
-    public enum MediaType
-    {
-        MOVIE,
-        SERIES,
-        UNKNOWN
-    }
     public class Torrent
     {
         public string? Hash                  { get; set; }
@@ -57,20 +53,11 @@ namespace uTorrent.Core.Torrent
 
         public string? AddedDate             { get; set; }
 
-        public string? FileName { get; set; }
+        public bool Extracted                { get; set; }
 
-        public string? Extension { get; set; }
        
-    }
-
-    public class MediaInfo
-    {
-        public string SortName { get; set; }
-        public int? Season { get; set; }
-        public int? Episode { get; set; }
-        public MediaType MediaType { get; set; } = MediaType.UNKNOWN;
-        public string Resolution { get; set; }
-        public int Year { get; set; } = 0;
 
     }
+    
+
 }

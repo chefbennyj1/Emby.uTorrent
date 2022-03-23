@@ -16,6 +16,8 @@
   <None Remove="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
   <None Remove="Configuration\TorrentPluginPostProcessingConfigurationPage.html" />
   <None Remove="Configuration\TorrentPluginPostProcessingConfigurationPage.js" />
+  <None Remove="Configuration\TorrentPluginRssConfigurationPage.html" />
+  <None Remove="Configuration\TorrentPluginRssConfigurationPage.js" />
   <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.html" />
   <None Remove="Configuration\TorrentPluginSeedingConfigurationPage.js" />
   <None Remove="Configuration\TorrentPluginSettingsConfigurationPage.html" />
@@ -31,6 +33,8 @@
   <EmbeddedResource Include="Configuration\TorrentPluginDownloadingConfigurationPage.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginPostProcessingConfigurationPage.html" />
   <EmbeddedResource Include="Configuration\TorrentPluginPostProcessingConfigurationPage.js" />
+  <EmbeddedResource Include="Configuration\TorrentPluginRssConfigurationPage.html" />
+  <EmbeddedResource Include="Configuration\TorrentPluginRssConfigurationPage.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.html" />
   <EmbeddedResource Include="Configuration\TorrentPluginSeedingConfigurationPage.js" />
   <EmbeddedResource Include="Configuration\TorrentPluginSettingsConfigurationPage.html" />

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace uTorrent.Core.RssFeed
+namespace uTorrent.Core.uTorrent.Rss
 {
-    public class RssFeed
+    public class UTorrentRssFeed
     {
       public string FeedId { get; set; }
       public string Enabled{ get; set; }

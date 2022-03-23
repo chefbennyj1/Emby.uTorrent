@@ -33,26 +33,31 @@ namespace uTorrent.Core.PostProcessing
 
             if (config.FinishedDownloadsLocation is null || config.EmbyAutoOrganizeFolderPath is null) return;
 
-           
-
             var monitoredDirectoryInfo     = FileSystem.GetDirectories(path: config.FinishedDownloadsLocation);
 
             var monitoredDirectoryContents = monitoredDirectoryInfo.ToList();
             
-
             logger.Info("Found: " + monitoredDirectoryContents.Count() + " folders in " + config.FinishedDownloadsLocation);
             
-
             foreach (var mediaFolder in monitoredDirectoryContents)
             {
                 //Ignore this directory if there is an 'extraction marker' file present because we have already extracted the contents of this folder.
                 if (FileSystem.FileExists(Path.Combine(mediaFolder.FullName, "####emby.extracted####"))) continue;
 
-                logger.Info("New media folder: " + mediaFolder.FullName);
+                logger.Info("New media folder found for extraction: " + mediaFolder.FullName);
                 
-                CreateExtractionMarker(mediaFolder.FullName, logger);
+                IEnumerable<FileSystemMetadata> newMediaFiles;
 
-                var newMediaFiles = FileSystem.GetFiles(mediaFolder.FullName);
+                try
+                {
+                    newMediaFiles = FileSystem.GetFiles(mediaFolder.FullName);
+                }
+                catch(IOException) //The files are in use, get it next time.
+                {
+                    continue;
+                }
+
+                CreateExtractionMarker(mediaFolder.FullName, logger);
 
                 foreach (var file in newMediaFiles)
                 {
@@ -109,11 +114,11 @@ namespace uTorrent.Core.PostProcessing
             };
         }
 
-        public string Name        => "Unpack media files";
-        public string Description => "Unzip or Copy new files available in the configured watch folder into Emby's Auto Organize folder.";
+        public string Name        => "Extract new media files";
+        public string Description => "Extract new files available in the configured watch folder into Emby's Auto Organize folder.";
         public string Category    => "Library";
         public string Key         => "FileCompressionCopy";
-        public bool IsHidden      => false;
+        public bool IsHidden      => !Plugin.Instance.Configuration.EnableTorrentUnpacking;
         public bool IsEnabled     => Plugin.Instance.Configuration.EnableTorrentUnpacking;
         public bool IsLogged      => true;
     }

@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using uTorrent.Helpers;
-using uTorrent.Core.Settings;
-namespace uTorrent.Core.Torrent
+using MediaBrowser.Controller.Library;
+using uTorrent.Utils;
+
+namespace uTorrent.Core.uTorrent
 {
     public class TorrentParser
     {
-        public static List<Torrent> ParseTorrentData(List<object[]> obj, Settings.Settings settings)
+        public static IEnumerable<Torrent> ParseTorrentData(List<object[]> obj, ILibraryManager libraryManager)
         {
-            var dir    = (string) settings.settings[22][2];
+            var finishedDownloadingDirectory = Plugin.Instance.Configuration.FinishedDownloadsLocation;//(string) settings.settings[22][2];
+            var mediaInfo                    = new MediaInfoParser();
+            var fileSizeConversions          = new FileSizeConversions();
 
             // ReSharper disable once ComplexConditionExpression
             var list = obj.Select(t => new Torrent
@@ -19,15 +21,15 @@ namespace uTorrent.Core.Torrent
                 Hash                  = (string)t[0],
                 Status                = ParseStatus(Convert.ToInt32((string)t[1]), Convert.ToInt32((string)t[4])).Trim(), //== "201" ? "started" : (string)t[1] == "136" ? "stopped" : (string)t[1] == "233" ? "paused" : (string)t[1] == "130" ? "re-check" : "queued",
                 Name                  = (string)t[2],
-                Size                  = FileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[3])),
-                MediaInfo             = GetMediaInfo((string)t[2]),
+                Size                  = fileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[3])),
+                MediaInfo             = mediaInfo.GetMediaInfo((string)t[2]),
                 TotalBytes            = (string)t[3],
                 Progress              = (string)t[4],
                 Downloaded            = (string)t[5],
                 Uploaded              = (string)t[6],
                 Ratio                 = (string)t[7],
                 UploadSpeed           = (string)t[8],
-                DownloadSpeedFriendly = FileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[9])),
+                DownloadSpeedFriendly = fileSizeConversions.SizeSuffix(Convert.ToInt64((string)t[9])),
                 DownloadSpeed         = (string)t[9],
                 Eta                   = CalculateEta(Convert.ToInt32((string)t[10])).ToString(),
                 Label                 = (string)t[11],
@@ -38,19 +40,21 @@ namespace uTorrent.Core.Torrent
                 Availability          = (string)t[16],
                 TorrentQueueOrder     = (string)t[17],
                 Remaining             = (string)t[18],
-                AddedDate             = GetAddedDate(dir, (string)t[2])
+                AddedDate             = GetAddedDate(finishedDownloadingDirectory, (string)t[2]),
+                Extracted             = IsExtracted(finishedDownloadingDirectory, (string)t[2]),
+                
             });
 
             
-            return list.ToList();
+            return list;
         }
 
-        
+      
         private static string ParseStatus(int status, int progress)
         {
             switch (status)
             {
-                case 201: return " started";
+                case 201: return "started";
                 case 136: return "stopped";
                 case 233: return "paused";
                 case 130: return "re-check";
@@ -65,9 +69,20 @@ namespace uTorrent.Core.Torrent
             if (minutes > 100000) return TimeSpan.Zero;
             return TimeSpan.FromMinutes(minutes);
         }
-       
 
-        //Older versions of uTorrent doesn't have the date added parameter return in the API.
+        private static bool IsExtracted(string dir, string torrentName)
+        {
+            try
+            {
+                var torrentFolder = Path.Combine(dir, torrentName);
+                return File.Exists(Path.Combine(torrentFolder, "####emby.extracted####"));
+            }
+            catch { }
+
+            return false;
+        }
+
+        //Older versions of uTorrent don't have the date added parameter return in the API.
         //We'll use the creation time of the file to get the added date for our service
         private static string GetAddedDate(string dir, string torrentName)
         {
@@ -76,7 +91,7 @@ namespace uTorrent.Core.Torrent
             {
                 foreach (var folder in Directory.GetDirectories(dir))
                 {
-                    if (folder == $"{dir}\\{torrentName}")
+                    if (folder == Path.Combine(dir, torrentName))
                     {
                         return File.GetCreationTime(folder).ToString("dd/MM/yyyy");
                     }
@@ -103,67 +118,7 @@ namespace uTorrent.Core.Torrent
 
             return DateTime.Now.ToString("dd/MM/yyyy");
         }
-        private static MediaInfo GetMediaInfo(string fileName)
-        {
-            
-            var regexDate = new Regex(@"\b(19|20|21)\d{2}\b");
-            var regexTvShow = new Regex(@"(.*?)\.[Ss](\d{1,2})[Ee](\d{2})\.(.*)", RegexOptions.IgnoreCase);
-            
-            var dateMatch = regexDate.Match(fileName);
-            if (dateMatch.Success)
-            {
-                var testTvShow = new Regex(@"([Ss](\d{1,2})[Ee](\d{1,2}))", RegexOptions.IgnoreCase);
-                if (testTvShow.Matches(fileName).Count < 1) //It's a movie.
-                {
-                   
-                    return new MediaInfo()
-                    {
-                        SortName = fileName.Split(new[] { dateMatch.Value }, StringSplitOptions.None)[0].Replace('.', ' ').TrimEnd(),
-                        Resolution = GetStreamResolutionFromFileName(fileName),
-                        MediaType = MediaType.MOVIE,
-                        Year = Convert.ToInt32(dateMatch.Value),
-                    };
-                }
-                
-            }
-
-            var tvShowMatchCollection = regexTvShow.Matches(fileName);
-           
-            foreach (Match match in tvShowMatchCollection)
-            {
-                int.TryParse(match.Groups[2].Value, out var season);
-                int.TryParse(match.Groups[3].Value, out var episode); 
-                return new MediaInfo()
-                {
-                    SortName = match.Groups[1].Value.Replace(".", " "),
-                    Resolution = GetStreamResolutionFromFileName(fileName),
-                    Season = season,
-                    Episode = episode,
-                    MediaType = MediaType.SERIES 
-                };
-            }
-            return null;
-        }
-        private static string GetStreamResolutionFromFileName(string sourceFileName)
-        {
-            var videoResolutionFlags = new[]
-            {
-                "480p",
-                "720p",
-                "1080p",
-                "2160p", 
-                "4K"
-            };
-            
-            foreach(var resolution in videoResolutionFlags)
-            {
-                if(sourceFileName.Contains(resolution))
-                {
-                    return resolution;
-                }
-            }
-            return string.Empty;
-        }
+        
     }
     
 }

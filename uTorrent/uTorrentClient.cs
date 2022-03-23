@@ -6,11 +6,12 @@ using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Model.Serialization;
 
 namespace uTorrent {
-    public class TorrentClient : IServerEntryPoint
+    // ReSharper disable once InconsistentNaming
+    public class uTorrentClient : IServerEntryPoint
     {
         private IJsonSerializer JsonSerializer { get; set; }
-        public static TorrentClient Instance { get; set; }
-        public TorrentClient(IJsonSerializer json)
+        public static uTorrentClient Instance { get; set; }
+        public uTorrentClient(IJsonSerializer json)
         {
             JsonSerializer = json;
             Instance = this;

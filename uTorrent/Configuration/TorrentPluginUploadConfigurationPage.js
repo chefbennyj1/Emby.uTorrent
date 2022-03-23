@@ -24,7 +24,11 @@
                 {
                     href: Dashboard.getConfigurationPageUrl('TorrentPluginPostProcessingConfigurationPage'),
                     name: "Post Processing"
-                }
+                },
+                //{
+                //    href: Dashboard.getConfigurationPageUrl('TorrentPluginRssConfigurationPage'),
+                //    name: "Rss"
+                //}
             ];
         }
 

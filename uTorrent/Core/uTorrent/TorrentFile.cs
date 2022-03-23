@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace uTorrent.Core.Torrent
+namespace uTorrent.Core.uTorrent
 {
     public class TorrentFile
     {
