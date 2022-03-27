@@ -1,6 +1,4 @@
-﻿//{
-//    "build":25249,"settings": [
-//   ["torrents_start_stopped",1,"false"]
+﻿// [["torrents_start_stopped",1,"false"]
 //,["confirm_when_deleting",1,"true"]
 //,["install_revision",0,"25249"]
 //,["settings_saved_systime",0,"1606822200"]

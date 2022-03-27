@@ -239,7 +239,7 @@ namespace uTorrent.Api
 
             //var settings = uTorrentClient.Instance.Get<Settings>($"http://{config.ipAddress}:{config.port}{gui}{token}{requestToken}{getSettings}", "application/json");
 
-            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrentp, LibraryManager));
+            torrents.AddRange(TorrentParser.ParseTorrentData(results.torrentp, JsonSerializer));
 
             var totalDownloadRate = fileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32((string)t.DownloadSpeed))).Split(' ');
             var totalUploadRate = fileSizeConversions.SizeSuffix(torrents.Sum(t => Convert.ToInt32(t.UploadSpeed))).Split(' ');
@@ -285,7 +285,7 @@ namespace uTorrent.Api
                     //Only downloading torrents
                     //var temp = new List<Torrent>();
                     torrents.Clear();
-                    torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, LibraryManager).Where(t => Convert.ToInt32(t.Progress) < 1000)); //Add the new data to the temp list
+                    torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, JsonSerializer).Where(t => Convert.ToInt32(t.Progress) < 1000)); //Add the new data to the temp list
                                                                                                                                         
                 }
             }
@@ -294,7 +294,7 @@ namespace uTorrent.Api
                 //Only seeding torrents
                 //var temp = new List<Torrent>();
                 torrents.Clear();
-                torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, LibraryManager).Where(t => Convert.ToInt32(t.Progress) >= 1000)); //Add the new data to the temp list
+                torrents.AddRange(TorrentParser.ParseTorrentData(results.torrents, JsonSerializer).Where(t => Convert.ToInt32(t.Progress) >= 1000)); //Add the new data to the temp list
                 
             }
 

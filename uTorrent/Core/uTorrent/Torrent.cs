@@ -55,7 +55,7 @@ namespace uTorrent.Core.uTorrent
 
         public bool Extracted                { get; set; }
 
-       
+        public TorrentFileInfo? TorrentFileInfo { get; set; }
 
     }
     

@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Serialization;
+using uTorrent.Core.Bencode2Json;
 using uTorrent.Utils;
 
 namespace uTorrent.Core.uTorrent
 {
     public class TorrentParser
     {
-        public static IEnumerable<Torrent> ParseTorrentData(List<object[]> obj, ILibraryManager libraryManager)
+        public static IEnumerable<Torrent> ParseTorrentData(List<object[]> obj, IJsonSerializer jsonSerilaizer)
         {
             var finishedDownloadingDirectory = Plugin.Instance.Configuration.FinishedDownloadsLocation;//(string) settings.settings[22][2];
+
+            //Create a configuration for this. The use4re must poijt to this folder, and permissions to access it must be given.
+            var uTorrentFolderPath = Path.Combine(@"\\SlaveOne\C\Users\Benjamin\AppData\Roaming", "uTorrent");
+
             var mediaInfo                    = new MediaInfoParser();
             var fileSizeConversions          = new FileSizeConversions();
 
@@ -42,14 +47,26 @@ namespace uTorrent.Core.uTorrent
                 Remaining             = (string)t[18],
                 AddedDate             = GetAddedDate(finishedDownloadingDirectory, (string)t[2]),
                 Extracted             = IsExtracted(finishedDownloadingDirectory, (string)t[2]),
-                
+                TorrentFileInfo       = GetTorrentFileInfo(jsonSerilaizer, Path.Combine(uTorrentFolderPath, $"{(string)t[2]}.torrent"))
+
             });
 
-            
             return list;
         }
 
-      
+        private static TorrentFileInfo GetTorrentFileInfo(IJsonSerializer jsonSerializer, string fileName)
+        {
+            try
+            {
+                var bencode = new BencodedData(new FileStream(fileName, FileMode.Open));
+                var json = bencode.ConvertToJson();
+                return jsonSerializer.DeserializeFromString<TorrentFileInfo>(json);
+            }
+            catch
+            {
+                return new TorrentFileInfo();
+            }
+        }
         private static string ParseStatus(int status, int progress)
         {
             switch (status)
